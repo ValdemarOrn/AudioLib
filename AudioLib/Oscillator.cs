@@ -7,7 +7,7 @@ namespace AudioLib
 	public class Oscillator
 	{
 		// 0.0 ... 1.0, 1.0 = 2*Pi/sec
-		float Frequency;
+		double Frequency;
 		public WaveStack Waves;
 		public double Phase;
 
@@ -20,12 +20,12 @@ namespace AudioLib
 		/// Set the frequency of the oscillator in Hz
 		/// </summary>
 		/// <param name="Freq">The desired frequency in rad/sec. 1.0 = 2*Pi rad/sec = Fs. 0.5 = Fs/2 (Max)</param>
-		public void SetFrequencyRadSec(float Freq)
+		public void SetFrequencyRadSec(double Freq)
 		{
 			this.Frequency = Freq;
 		}
 
-		public void SetFrequencyHz(float hz, float Fs)
+		public void SetFrequencyHz(double hz, double Fs)
 		{
 			this.Frequency = hz / Fs;
 		}
@@ -39,9 +39,9 @@ namespace AudioLib
 		/// Note: Negative values are allowed
 		/// </param>
 		/// <param name="Fs">The sampling frequency used as reference</param>
-		public void SetFrequencyPitch(float pitch, float Fs)
+		public void SetFrequencyPitch(double pitch, double Fs)
 		{
-			float p = (float)Math.Pow(2, (pitch - 69f)/12.0f) * 440.0f;
+			double p = (double)Math.Pow(2, (pitch - 69f)/12.0f) * 440.0f;
 			this.Frequency = p / Fs;
 		}
 
@@ -50,15 +50,15 @@ namespace AudioLib
 		/// </summary>
 		/// <param name="CV">control voltage. 4V = 440Hz = A4. 1 volt per octave</param>
 		/// <param name="Fs">The sampling frequency used as reference</param>
-		public void SetFrequencyCV(float CV, float Fs)
+		public void SetFrequencyCV(double CV, double Fs)
 		{
-			float pitch = (float)Math.Pow(2,(CV-4.0f))*440.0f;
+			double pitch = (double)Math.Pow(2,(CV-4.0f))*440.0f;
 			this.Frequency = pitch / Fs;
 		}
 
-		public float getSample()
+		public double getSample()
 		{
-			var sample = Waves.GetSample((float)Phase, Frequency);
+			var sample = Waves.GetSample((double)Phase, Frequency);
 			Phase = (Phase + Frequency) % 1.0;
 
 			return sample;

@@ -23,47 +23,47 @@ namespace AudioLib
 			get { return (b.Length > a.Length) ? b.Length - 1 : a.Length - 1; }
 		}
 
-		public float[] B
+		public double[] B
 		{
 			get { return b; }
 			set 
 			{
 				if (value == null) throw new ArgumentNullException();
 				b = value;
-				bufIn = new float[Order + 2];
-				bufOut = new float[Order + 2];
+				bufIn = new double[Order + 2];
+				bufOut = new double[Order + 2];
 				p = 0;
 			}
 		}
 
-		public float[] A
+		public double[] A
 		{
 			get { return a; }
 			set
 			{
 				if (value == null) throw new ArgumentNullException();
 				a = value;
-				bufIn = new float[Order + 2];
-				bufOut = new float[Order + 2];
+				bufIn = new double[Order + 2];
+				bufOut = new double[Order + 2];
 				p = 0;
 			}
 		}
-	
-		private float[] b;
-		private float[] a;
 
-		private float[] bufIn;
-		private float[] bufOut;
+		private double[] b;
+		private double[] a;
+
+		private double[] bufIn;
+		private double[] bufOut;
 
 		private int p = 0;
 
 		public Transfer()
 		{
-			b = new float[1];
-			a = new float[1];
+			b = new double[1];
+			a = new double[1];
 
-			B = new float[1];
-			A = new float[1];
+			B = new double[1];
+			A = new double[1];
 		}
 
 		/// <summary>
@@ -75,14 +75,19 @@ namespace AudioLib
 
 		}
 
-		public virtual float[] process(float[] input)
+		public virtual double[] process(double[] input)
 		{
-			float[] output = new float[input.Length];
+			double[] output = new double[input.Length];
 			process(input, output);
 			return output;
 		}
 
-		public virtual void process(float[] input, float[] output)
+		public virtual void processInPlace(double[] input)
+		{
+			process(input, input);
+		}
+
+		public virtual void process(double[] input, double[] output)
 		{
 			if(input.Length > output.Length)
 				return;
@@ -98,13 +103,19 @@ namespace AudioLib
 				bufOut[p] = 0;
 
 				for(int j = 0; j < b.Length; j++)
-					bufOut[p] += b[j] * bufIn[((p - j) + mod) % mod];
+					bufOut[p] += (double)(b[j] * bufIn[((p - j) + mod) % mod]);
 
 				for(int j = 1; j < a.Length; j++)
-					bufOut[p] -= a[j] * bufOut[((p - j) + mod) % mod];
+					bufOut[p] -= (double)(a[j] * bufOut[((p - j) + mod) % mod]);
 
 				if (a[0] != 1.0f && a[0] != 0)
-					bufOut[p] = bufOut[p] / a[0];
+					bufOut[p] = (double)(bufOut[p] / a[0]);
+
+				if (bufOut[p] > 999999)
+					bufOut[p] = 999999;
+
+				if (bufOut[p] < -999999)
+					bufOut[p] = -999999;
 
 				output[i] = bufOut[p];
 			}

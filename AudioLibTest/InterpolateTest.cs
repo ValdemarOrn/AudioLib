@@ -17,12 +17,12 @@ namespace AudioLib.Test
 		[Test]
 		public void TestCubicInterpolate()
 		{
-			float[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
+			double[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
 
 			var dist = Utils.Linspace(0.0f, 1.0f, 100);
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.CubicWrap(dist[i], table);
+				dist[i] = (double)Interpolate.CubicWrap(dist[i], table);
 			}
 
 			Line l = new Line(Utils.Linspace(0, 1, table.Length).Select(x => (double)x).ToArray(), table.Select(x => (double)x).ToArray());
@@ -38,12 +38,12 @@ namespace AudioLib.Test
 		[Test]
 		public void TestCosineInterpolate()
 		{
-			float[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
+			double[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
 
 			var dist = Utils.Linspace(0.0f, 1.0f, 100);
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.Cosine(dist[i], table);
+				dist[i] = (double)Interpolate.Cosine(dist[i], table);
 			}
 
 			Line l = new Line(Utils.Linspace(0, 1, table.Length).Select(x => (double)x).ToArray(), table.Select(x => (double)x).ToArray());
@@ -59,12 +59,12 @@ namespace AudioLib.Test
 		[Test]
 		public void TestSplineInterpolate()
 		{
-			float[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
+			double[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
 
 			var dist = Utils.Linspace(0.0f, 1.0f, 100);
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.Spline(dist[i], table);
+				dist[i] = (double)Interpolate.Spline(dist[i], table);
 			}
 
 			Line l = new Line(Utils.Linspace(0, 1, table.Length).Select(x => (double)x).ToArray(), table.Select(x => (double)x).ToArray());
@@ -80,12 +80,12 @@ namespace AudioLib.Test
 		[Test]
 		public void TestSplineWrapInterpolate()
 		{
-			float[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
+			double[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
 
 			var dist = Utils.Linspace(0.0f, 1.0f, 100);
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.SplineWrap(dist[i], table);
+				dist[i] = (double)Interpolate.SplineWrap(dist[i], table);
 			}
 
 			Line l = new Line(Utils.Linspace(0, 1, table.Length).Select(x => (double)x).ToArray(), table.Select(x => (double)x).ToArray());
@@ -101,14 +101,14 @@ namespace AudioLib.Test
 		[Test]
 		public void TestInterpolateSpeed()
 		{
-			float[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
+			double[] table = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f };
 			var s = new Stopwatch();
 
 			var dist = Utils.Linspace(0.0f, 1.0f, 999999);
 			s.Restart();
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.Linear(dist[i], table);
+				dist[i] = (double)Interpolate.Linear(dist[i], table);
 			}
 			s.Stop();
 			var linear = s.ElapsedMilliseconds;
@@ -117,7 +117,7 @@ namespace AudioLib.Test
 			s.Restart();
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.Spline(dist[i], table);
+				dist[i] = (double)Interpolate.Spline(dist[i], table);
 			}
 			s.Stop();
 			var spline = s.ElapsedMilliseconds;
@@ -126,7 +126,7 @@ namespace AudioLib.Test
 			s.Restart();
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.CubicWrap(dist[i], table);
+				dist[i] = (double)Interpolate.CubicWrap(dist[i], table);
 			}
 			s.Stop();
 			var cubic = s.ElapsedMilliseconds;
@@ -135,7 +135,7 @@ namespace AudioLib.Test
 			s.Restart();
 			for (int i = 0; i < dist.Length; i++)
 			{
-				dist[i] = (float)Interpolate.Cosine(dist[i], table);
+				dist[i] = (double)Interpolate.Cosine(dist[i], table);
 			}
 			s.Stop();
 			var cosine = s.ElapsedMilliseconds;

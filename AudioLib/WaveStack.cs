@@ -12,14 +12,14 @@ namespace AudioLib
 		public int NumPartials { get { return Waves.Count; } }
 		public int[] PartialsInWave;
 
-		public float[] MasterWave;
+		public double[] MasterWave;
 
-		public List<float[]> Waves;
+		public List<double[]> Waves;
 
-		public WaveStack(float[] wave = null)
+		public WaveStack(double[] wave = null)
 		{
 			if (wave == null)
-				wave = Utils.Sinewave(2048, 0.0f, (float)(1.0 / 2048 * 2 * Math.PI), 1.0f);
+				wave = Utils.Sinewave(2048, 0.0f, (double)(1.0 / 2048 * 2 * Math.PI), 1.0f);
 			SetWave(wave);
 		}
 
@@ -31,11 +31,11 @@ namespace AudioLib
 		/// The high resolution wave that will be filtered and downsampled. 
 		/// Should be 1024 samples or larger.
 		/// </param>
-		public void SetWave(float[] wave)
+		public void SetWave(double[] wave)
 		{
 			this.MasterWave = wave;
-			this.PartialsInWave = findMaxPartials(256, (float)(17.5/21.0), 50000);
-			this.Waves = new List<float[]>();
+			this.PartialsInWave = findMaxPartials(256, (double)(17.5/21.0), 50000);
+			this.Waves = new List<double[]>();
 
 			var s = new Stopwatch();
 			s.Reset();
@@ -46,7 +46,7 @@ namespace AudioLib
 			var cos = dft[0];
 			var sin = dft[1];
 
-			float normalizer = 1.0f / cos.Length * 2.0f;
+			double normalizer = 1.0f / cos.Length * 2.0f;
 			for (int i = 0; i < cos.Length; i++)
 			{
 				cos[i] = cos[i] * normalizer;
@@ -79,10 +79,10 @@ namespace AudioLib
 					}
 				}
 
-				// double -> float. I used to for extra precision to minimize errors
-				float[] output2 = new float[size];
+				// double -> double. I used to for extra precision to minimize errors
+				double[] output2 = new double[size];
 				for (int i = 0; i < size; i++)
-					output2[i] += (float)output[i];
+					output2[i] += (double)output[i];
 				
 				this.Waves.Add(output2);
 			}
@@ -98,12 +98,12 @@ namespace AudioLib
 		/// <param name="minFreq">the minimum frequency, relative to Fs/2 that is acceptable</param>
 		/// <param name="steps">number of steps to run. Higher is more accurate</param>
 		/// <returns></returns>
-		public static int[] findMaxPartials(int maxPartials, float minFreq, int steps)
+		public static int[] findMaxPartials(int maxPartials, double minFreq, int steps)
 		{
 			List<int> output = new List<int>();
 
 			int currentPartials = maxPartials;
-			float f = 1.0f / steps * 1;
+			double f = 1.0f / steps * 1;
 
 			// Add initial value, if its below the threshold
 			if (f * currentPartials < 1.0f)
@@ -140,10 +140,10 @@ namespace AudioLib
 		/// <param name="pos">the position within the table. 0..1</param>
 		/// <param name="frequency">the frequency in rad/sex, 1.0 corresponding to 2*Pi rad/sec = Fs. Max 0.5 = Fs/2</param>
 		/// <returns></returns>
-		public float GetSample(float pos, float frequency)
+		public double GetSample(double pos, double frequency)
 		{
 			int maxPartials = (int)(0.5 / frequency + 0.000001);
-			float[] wave;
+			double[] wave;
 
 			// --------------------------------------
 			// Find the correct wave in the stack
@@ -215,7 +215,7 @@ namespace AudioLib
 			}
 
 			// Find the correct sample in the wave (using spline interpolation)
-			float output = Interpolate.SplineWrap(pos, wave);
+			double output = Interpolate.SplineWrap(pos, wave);
 			return output;
 		}
 	}

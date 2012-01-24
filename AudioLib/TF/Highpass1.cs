@@ -9,16 +9,13 @@ namespace AudioLib.TF
 	{
 		public const int P_FREQ = 0;
 
-		public Highpass1(float fs)
-			: base(fs)
-		{
-			parameters = new float[1];
-		}
+		public Highpass1(float fs) : base(fs, 1)
+		{ }
 
 		public override void Update()
 		{
-			float[] b = new float[2];
-			float[] a = new float[2];
+			double[] b = new double[2];
+			double[] a = new double[2];
 
 			// PRevent going over the Nyquist frequency
 			if (parameters[P_FREQ] >= fs / 2)
@@ -28,11 +25,11 @@ namespace AudioLib.TF
 			float f = (float)(2.0f*fs*(Math.Tan((parameters[P_FREQ]*2*Math.PI)/(fs*2))));
 			if (f == 0) f = 0.0001f; // prevent divByZero exception
 
-			b[0] = -2*fs;
-			b[1] = 2*fs;
+			b[0] = 2*fs;
+			b[1] = -2*fs;
 
-			a[0] = f-2*fs;
-			a[1] = f+2*fs;
+			a[0] = f+2*fs;
+			a[1] = f-2*fs;
 
 			// normalize
 			b[0] = b[0] / a[0];

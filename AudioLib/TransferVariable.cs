@@ -7,15 +7,16 @@ namespace AudioLib
 {
 	public class TransferVariable : Transfer
 	{
-		public float[] parameters;
-		public float fs;
+		public double[] parameters;
+		public double fs;
 
-		public TransferVariable(float fs)
+		public TransferVariable(double fs, int numberOfParameters)
 		{
 			this.fs = fs;
+			parameters = new double[numberOfParameters];
 		}
 
-		public virtual void SetParam(int paramNumber, float param)
+		public virtual void SetParam(int paramNumber, double param)
 		{
 			if ( paramNumber < parameters.Length && paramNumber >= 0 )
 				parameters[paramNumber] = param;

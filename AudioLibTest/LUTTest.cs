@@ -14,7 +14,11 @@ namespace AudioLib.Test
 		{
 			var l = new LUT();
 			l.ReadFile("1N914_tf.txt");
-			l.Read(8.0f);
+			var v = l.GetValue(8.0f);
+			Assert.AreEqual(0.6785316, v, 0.000001);
+
+			v = l.GetValue(0.0f);
+			Assert.AreEqual(0.0, v, 0.0003);
 		}
 	}
 }

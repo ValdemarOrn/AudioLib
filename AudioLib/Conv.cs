@@ -6,20 +6,20 @@ namespace AudioLib
 {
 	public class Conv
 	{
-		private float[] response;
-		private float[] tail;
+		private double[] response;
+		private double[] tail;
 
-		public Conv(float[] responseIn)
+		public Conv(double[] responseIn)
 		{
 			this.response = responseIn;
 
-			this.tail = new float[this.response.Length - 1];
+			this.tail = new double[this.response.Length - 1];
 		}
 
-		public void setResponse(float[] inResponse)
+		public void setResponse(double[] inResponse)
 		{
 			this.response = inResponse;
-			this.tail = new float[this.response.Length - 1];
+			this.tail = new double[this.response.Length - 1];
 		}
 
 		/**
@@ -27,11 +27,11 @@ namespace AudioLib
 		 * @param input Input signal to be processed
 		 * @return processed signal <b>without</b> the "tail". output.length = input.length
 		 */
-		public float[] process(float[] input)
+		public double[] process(double[] input)
 		{
-			float[] data = Conv.conv(this.response, input);
-			float[] output = new float[input.Length];
-			float[] newTail = new float[tail.Length];
+			double[] data = Conv.conv(this.response, input);
+			double[] output = new double[input.Length];
+			double[] newTail = new double[tail.Length];
 
 			int i = 0;
 			while (i < data.Length)
@@ -60,9 +60,9 @@ namespace AudioLib
 			return output;
 		}
 
-		public static float[] conv(float[] h, float[] g)
+		public static double[] conv(double[] h, double[] g)
 		{
-			float[] output = new float[h.Length + g.Length - 1];
+			double[] output = new double[h.Length + g.Length - 1];
 
 			// To minimize the number of MAC-operations, split the loop in two
 			// parts, use different algorithms on each side
@@ -90,7 +90,7 @@ namespace AudioLib
 		/// <param name="data"></param>
 		/// <param name="kernel"></param>
 		/// <returns></returns>
-		public static float[] ConvSimpleCircular(float[] data, float[] kernel)
+		public static double[] ConvSimpleCircular(double[] data, double[] kernel)
 		{
 			int M = (kernel.Length - 1) / 2;
 			// Note: kernel[M] is the midpoint of filter ;)
@@ -102,11 +102,11 @@ namespace AudioLib
 			while (moduloConstant < kernel.Length)
 				moduloConstant += data.Length;
 
-			var output = new float[data.Length];
+			var output = new double[data.Length];
 
 			for (int i = 0; i < data.Length; i++)
 			{
-				float sample = data[i] * kernel[M];
+				double sample = data[i] * kernel[M];
 
 				for (int j = 1; j < (kernel.Length - 1) / 2; j++)
 				{

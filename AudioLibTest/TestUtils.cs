@@ -24,9 +24,9 @@ namespace AudioLib.Test
 
 			Transfer tf = new Transfer();
 			tf.B = kernel;
-			//tf.A = new float[1] { 1.0f };
+			//tf.A = new double[1] { 1.0f };
 
-			float[] wave = new float[100000];
+			double[] wave = new double[100000];
 			for (int i = 0; i < wave.Length; i++)
 			{
 				wave[i] = ((i % 2000) < 1000) ? 1 : 0;
@@ -46,7 +46,7 @@ namespace AudioLib.Test
 			var saw = Utils.Saw(1024, 1.0f);
 
 			Line l = new Line(Utils.Linspace(-1, 1, saw.Length), saw); l.LinePen = Pens.Blue;
-			Line l2 = new Line(Utils.Linspace(-1, 1, 2), new float[2] { 1, -1 }); l2.LinePen = Pens.Red;
+			Line l2 = new Line(Utils.Linspace(-1, 1, 2), new double[2] { 1, -1 }); l2.LinePen = Pens.Red;
 			var list = new List<Line>() { l, l2 };
 			Plot.Plot.ShowPlot(list);
 		}
@@ -57,7 +57,7 @@ namespace AudioLib.Test
 			var sqr = Utils.Square(1024, 64, 1.0f);
 
 			Line l = new Line(Utils.Linspace(-1, 1, sqr.Length), sqr); l.LinePen = Pens.Blue;
-			Line l2 = new Line(new float[4] { -1, 0, 0, 1 }, new float[4] { 1, 1, -1, -1 }); l2.LinePen = Pens.Red;
+			Line l2 = new Line(new double[4] { -1, 0, 0, 1 }, new double[4] { 1, 1, -1, -1 }); l2.LinePen = Pens.Red;
 			var list = new List<Line>() { l, l2 };
 			Plot.Plot.ShowPlot(list);
 		}
@@ -68,7 +68,7 @@ namespace AudioLib.Test
 			var tri = Utils.Triangle(1024, 1.0f);
 
 			Line l = new Line(Utils.Linspace(-1, 1, tri.Length), tri); l.LinePen = Pens.Blue;
-			Line l2 = new Line(new float[4] { -1, -0.5f, 0.5f, 1 }, new float[4] { 0, 1, -1, 0 }); l2.LinePen = Pens.Red;
+			Line l2 = new Line(new double[4] { -1, -0.5f, 0.5f, 1 }, new double[4] { 0, 1, -1, 0 }); l2.LinePen = Pens.Red;
 			var list = new List<Line>() { l, l2 };
 			Plot.Plot.ShowPlot(list);
 		}
@@ -78,10 +78,10 @@ namespace AudioLib.Test
 		{
 			var saw = Utils.Saw(1024, 1.0f);
 
-			var sine1 = Utils.Sinewave(1024, 0, 1 / 1024.0f * 2.0f * (float)Math.PI, 1.0f);
-			var sine2 = Utils.Sinewave(1024, 0, 2 / 1024.0f * 2.0f * (float)Math.PI, 1.0f);
-			//var sine1 = Utils.Sinewave(1024, 0, 1 / 1024.0f * 2.0f * (float)Math.PI, 1.0f);
-			//var sine1 = Utils.Sinewave(1024, 0, 1 / 1024.0f * 2.0f * (float)Math.PI, 1.0f);
+			var sine1 = Utils.Sinewave(1024, 0, 1 / 1024.0f * 2.0f * (double)Math.PI, 1.0f);
+			var sine2 = Utils.Sinewave(1024, 0, 2 / 1024.0f * 2.0f * (double)Math.PI, 1.0f);
+			//var sine1 = Utils.Sinewave(1024, 0, 1 / 1024.0f * 2.0f * (double)Math.PI, 1.0f);
+			//var sine1 = Utils.Sinewave(1024, 0, 1 / 1024.0f * 2.0f * (double)Math.PI, 1.0f);
 
 			for (int i = 0; i < saw.Length; i++)
 				saw[i] = sine1[i] + sine2[i] + 0.02f;

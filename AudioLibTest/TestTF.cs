@@ -27,26 +27,26 @@ namespace AudioLib.Test
 			var hp = new TF.Highpass1(48000.0f);
 			hp.SetParam(TF.Highpass1.P_FREQ, 500);
 
-			Assert.AreEqual(96000 / 92857.29, hp.B[0], 0.00001f);
-			Assert.AreEqual(-96000 / 92857.29, hp.B[1], 0.00001f);
+			Assert.AreEqual(96000 / 99142.714599609375, hp.B[0], 0.00001f);
+			Assert.AreEqual(-96000 / 99142.714599609375, hp.B[1], 0.00001f);
 			Assert.AreEqual(1.0, hp.A[0], 0.00001f);
-			Assert.AreEqual(-99142.71 / 92857.29, hp.A[1], 0.00001f);
+			Assert.AreEqual(-92857.285400390625 / 99142.714599609375, hp.A[1], 0.00001f);
 		}
 
 		[Test]
 		public void TestCombine()
 		{
 			var t1 = new Transfer();
-			t1.B = new float[2] { 1, 1 };
-			t1.A = new float[3] { 1, 2, 1 };
+			t1.B = new double[2] { 1, 1 };
+			t1.A = new double[3] { 1, 2, 1 };
 
 			var c = new TF.Combine();
 			c.TransferFunctions.Add(t1);
 			c.TransferFunctions.Add(t1);
 			c.Update();
 
-			Assert.AreEqual(new float[3] { 1, 2, 1 }, c.B);
-			Assert.AreEqual(new float[5] { 1, 4, 6, 4, 1 }, c.A);
+			Assert.AreEqual(new double[3] { 1, 2, 1 }, c.B);
+			Assert.AreEqual(new double[5] { 1, 4, 6, 4, 1 }, c.A);
 		}
 	}
 }

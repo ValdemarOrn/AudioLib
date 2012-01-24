@@ -9,15 +9,13 @@ namespace AudioLib.TF
 	{
 		public const int P_FREQ = 0;
 
-		public Lowpass1(float fs) : base(fs)
-		{
-			parameters = new float[1];
-		}
+		public Lowpass1(float fs) : base(fs, 1)
+		{ }
 
 		public override void Update()
 		{
-			float[] b = new float[2];
-			float[] a = new float[2];
+			double[] b = new double[2];
+			double[] a = new double[2];
 
 			// PRevent going over the Nyquist frequency
 			if(parameters[P_FREQ] >= fs / 2)

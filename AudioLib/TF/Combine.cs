@@ -16,9 +16,9 @@ namespace AudioLib.TF
 
 		public override void Update()
 		{
-			float[] newL = { 1 };
-			float[] b = newL;
-			float[] a = newL;
+			double[] newL = { 1 };
+			double[] b = newL;
+			double[] a = newL;
 
 			for (int i = 0; i < TransferFunctions.Count(); i++)
 			{

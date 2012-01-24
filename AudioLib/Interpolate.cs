@@ -7,12 +7,12 @@ namespace AudioLib
 {
 	public class Interpolate
 	{
-		public static float Linear(float position, float[] data)
+		public static double Linear(double position, double[] data)
 		{
-			float pos = position * (data.Length - 1);
-			float y1, y2;
-			float mu;
-			float output;
+			double pos = position * (data.Length - 1);
+			double y1, y2;
+			double mu;
+			double output;
 
 			int x0 = (int)pos;
 			if (x0 == data.Length - 1)
@@ -28,12 +28,12 @@ namespace AudioLib
 			return output;
 		}
 
-		public static float Cosine(float position, float[] data)
+		public static double Cosine(double position, double[] data)
 		{
-			float pos = position * (data.Length - 1);
-			float y1, y2;
-			float mu;
-			float output;
+			double pos = position * (data.Length - 1);
+			double y1, y2;
+			double mu;
+			double output;
 
 			int x0 = (int)pos;
 			if (x0 == data.Length - 1)
@@ -44,21 +44,21 @@ namespace AudioLib
 			y1 = data[x0];
 			y2 = data[x0 + 1];
 
-			float mu2;
+			double mu2;
 
-			mu2 = (float)((1 - Math.Cos(mu * Math.PI)) / 2);
+			mu2 = (double)((1 - Math.Cos(mu * Math.PI)) / 2);
 			output = (y1 * (1 - mu2) + y2 * mu2);
 
 			return output;
 		}
 
 
-		public static float Cubic(float position, float[] data)
+		public static double Cubic(double position, double[] data)
 		{
-			float pos = position * (data.Length - 1);
-			float y0, y1, y2, y3;
-			float a0, a1, a2, a3, mu;
-			float output;
+			double pos = position * (data.Length - 1);
+			double y0, y1, y2, y3;
+			double a0, a1, a2, a3, mu;
+			double output;
 
 			int x0 = (int)pos - 1;
 			mu = pos - x0 - 1;
@@ -85,7 +85,7 @@ namespace AudioLib
 			else
 				y3 = data[x0 + 3];
 
-			float mu2 = mu * mu;
+			double mu2 = mu * mu;
 			a0 = y3 - y2 - y0 + y1;
 			a1 = y0 - y1 - a0;
 			a2 = y2 - y0;
@@ -95,12 +95,12 @@ namespace AudioLib
 			return output;
 		}
 
-		public static float CubicWrap(float position, float[] data)
+		public static double CubicWrap(double position, double[] data)
 		{
-			float pos = position * (data.Length - 1);
-			float y0, y1, y2, y3;
-			float a0, a1, a2, a3, mu;
-			float output;
+			double pos = position * (data.Length - 1);
+			double y0, y1, y2, y3;
+			double a0, a1, a2, a3, mu;
+			double output;
 
 			int x0 = (int)pos - 1;
 			mu = pos - x0 - 1;
@@ -127,7 +127,7 @@ namespace AudioLib
 			else
 				y3 = data[x0 + 3];
 
-			float mu2 = mu * mu;
+			double mu2 = mu * mu;
 			a0 = y3 - y2 - y0 + y1;
 			a1 = y0 - y1 - a0;
 			a2 = y2 - y0;
@@ -137,12 +137,12 @@ namespace AudioLib
 			return output;
 		}
 
-		public static float Spline(float position, float[] data)
+		public static double Spline(double position, double[] data)
 		{
-			float pos = position * (data.Length - 1);
-			float y0, y1, y2, y3;
-			float a,b,c, mu;
-			float output;
+			double pos = position * (data.Length - 1);
+			double y0, y1, y2, y3;
+			double a,b,c, mu;
+			double output;
 
 			int x0 = (int)pos - 1;
 			mu = pos - x0 - 1;
@@ -173,25 +173,25 @@ namespace AudioLib
 			c = y1;
 			a = (y2 + y0) * 0.5f - y1;
 			b = (y2 - y0) * 0.5f;
-			float v1 = a * mu * mu + b * mu + c;
+			double v1 = a * mu * mu + b * mu + c;
 
 			// Spline 2
 			c = y2;
 			a = (y3 + y1) / 2 - y2;
 			b = (y3 - y1) / (2);
-			float mmu = (mu - 1);
-			float v2 = a * mmu * mmu + b * mmu + c;
+			double mmu = (mu - 1);
+			double v2 = a * mmu * mmu + b * mmu + c;
 
 			output = v1 * (1 - mu) + v2 * mu;
 			return output;
 		}
 
-		public static float SplineWrap(float position, float[] data)
+		public static double SplineWrap(double position, double[] data)
 		{
-			float pos = position * (data.Length - 1);
-			float y0, y1, y2, y3;
-			float a, b, c, mu;
-			float output;
+			double pos = position * (data.Length - 1);
+			double y0, y1, y2, y3;
+			double a, b, c, mu;
+			double output;
 
 			int x0 = (int)pos - 1;
 			mu = pos - x0 - 1;
@@ -222,14 +222,14 @@ namespace AudioLib
 			c = y1;
 			a = (y2 + y0) * 0.5f - y1;
 			b = (y2 - y0) * 0.5f;
-			float v1 = a * mu * mu + b * mu + c;
+			double v1 = a * mu * mu + b * mu + c;
 
 			// Spline 2
 			c = y2;
 			a = (y3 + y1) / 2 - y2;
 			b = (y3 - y1) / (2);
-			float mmu = (mu - 1);
-			float v2 = a * mmu * mmu + b * mmu + c;
+			double mmu = (mu - 1);
+			double v2 = a * mmu * mmu + b * mmu + c;
 
 			output = v1 * (1 - mu) + v2 * mu;
 			return output;
