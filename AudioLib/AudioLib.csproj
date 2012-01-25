@@ -56,6 +56,12 @@
     <Compile Include="TF\Lowpass1.cs" />
     <Compile Include="Transfer.cs" />
     <Compile Include="TransferVariable.cs" />
+    <Compile Include="UI\Switch.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Knob.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="WaveStack.cs" />
   </ItemGroup>
