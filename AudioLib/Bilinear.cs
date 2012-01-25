@@ -7,7 +7,7 @@ namespace AudioLib
 	/**
 	 * Takes data on the form
 	 * b3*s^3 + b2*s^2 + b1*s + b0
-	 * --------------------------- 
+	 * ---------------------------  
 	 * a3*s^3 + a2*s^2 + a1*s + a0
 	 * Warning: b[0] = b0, b[1] = b1, etc, so make sure array is not reversed
 	 * 
