@@ -19,7 +19,7 @@ namespace AudioLib.TF
 
 			// PRevent going over the Nyquist frequency
 			if (parameters[P_FREQ] >= fs / 2)
-				parameters[P_FREQ] = fs / 2 - 100;
+				parameters[P_FREQ] = fs / 2;
 
 			// Compensate for frequency in bilinear transform
 			float f = (float)(2.0f*fs*(Math.Tan((parameters[P_FREQ]*2*Math.PI)/(fs*2))));

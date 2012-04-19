@@ -75,19 +75,48 @@ namespace AudioLib
 
 		}
 
-		public virtual double[] process(double[] input)
+		public double process(double input)
+		{
+			// buffer size
+			var mod = bufIn.Length;
+
+			p = (p + 1) % mod;
+
+			bufIn[p] = input;
+			bufOut[p] = 0;
+
+			for (int j = 0; j < b.Length; j++)
+				bufOut[p] += (double)(b[j] * bufIn[((p - j) + mod) % mod]);
+
+			for (int j = 1; j < a.Length; j++)
+				bufOut[p] -= (double)(a[j] * bufOut[((p - j) + mod) % mod]);
+
+			if (a[0] != 1.0f && a[0] != 0)
+				bufOut[p] = (double)(bufOut[p] / a[0]);
+
+			if (bufOut[p] > 999999)
+				bufOut[p] = 999999;
+
+			if (bufOut[p] < -999999)
+				bufOut[p] = -999999;
+
+			var output = bufOut[p];
+			return output;
+		}
+
+		public double[] process(double[] input)
 		{
 			double[] output = new double[input.Length];
 			process(input, output);
 			return output;
 		}
 
-		public virtual void processInPlace(double[] input)
+		public void processInPlace(double[] input)
 		{
 			process(input, input);
 		}
 
-		public virtual void process(double[] input, double[] output)
+		public void process(double[] input, double[] output)
 		{
 			if(input.Length > output.Length)
 				return;

@@ -11,6 +11,8 @@ namespace AudioLib
 		public double max;
 		public double[] table;
 
+		public double bias;
+
 		public void ReadFile(string filename)
 		{
 			var lines = System.IO.File.ReadAllLines(filename);
@@ -50,6 +52,7 @@ namespace AudioLib
 
 		public double GetValue(double value)
 		{
+			value = value + bias;
 			if (!(value > min && value < max)) throw new ArgumentException("value is not between min and max. Value: " + value);
 
 			double idx = (double)((value - min) / (max - min));
