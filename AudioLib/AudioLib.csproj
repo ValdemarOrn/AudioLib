@@ -65,9 +65,16 @@
     <Compile Include="UI\Knob.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\VelocityMapControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\VelocityMapControl.Designer.cs">
+      <DependentUpon>VelocityMapControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="Valve\Model.cs" />
     <Compile Include="Valve\Triode.cs" />
+    <Compile Include="VelocityMap.cs" />
     <Compile Include="WaveStack.cs" />
   </ItemGroup>
   <ItemGroup />

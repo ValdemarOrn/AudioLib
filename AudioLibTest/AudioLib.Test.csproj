@@ -58,6 +58,7 @@
     <Compile Include="MidiTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="TestTF.cs" />
+    <Compile Include="VelocityMapTest.cs" />
     <Compile Include="WaveStackTest.cs" />
     <Compile Include="PlotTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
