@@ -5,33 +5,33 @@ using System.Text;
 
 namespace AudioLib
 {
-	public enum MidiMessageType
+	public class MidiMessageType
 	{
-		NoteOff			= 0x80,
-		NoteOn			= 0x90,
-		Aftertouch		= 0xA0,
-		ControlChange	= 0xB0,
-		ProgramChange	= 0xC0,
-		ChannelPressure	= 0xD0,
-		PitchWheel		= 0xE0,
+		public const int NoteOff			= 0x80;
+		public const int NoteOn				= 0x90;
+		public const int Aftertouch			= 0xA0;
+		public const int ControlChange		= 0xB0;
+		public const int ProgramChange		= 0xC0;
+		public const int ChannelPressure	= 0xD0;
+		public const int PitchWheel			= 0xE0;
 
-		Sysex				= 0xF0,
-		MTCQuarterFrame		= 0xF1,
-		SongPosition		= 0xF2,
-		SongSelect			= 0xF3,
-		TuneRequest			= 0xF6,
-		MidiClock			= 0xF8,
-		Tick				= 0xF9,
-		Start				= 0xFA,
-		Stop				= 0xFC,
-		Continue			= 0xFB,
-		ActiveSense			= 0xFE,
-		Reset				= 0xFF
+		public const int Sysex				= 0xF0;
+		public const int MTCQuarterFrame	= 0xF1;
+		public const int SongPosition		= 0xF2;
+		public const int SongSelect			= 0xF3;
+		public const int TuneRequest		= 0xF6;
+		public const int MidiClock			= 0xF8;
+		public const int Tick				= 0xF9;
+		public const int Start				= 0xFA;
+		public const int Stop				= 0xFC;
+		public const int Continue			= 0xFB;
+		public const int ActiveSense		= 0xFE;
+		public const int Reset				= 0xFF;
 	}
 
 	public struct Midi
 	{
-		public MidiMessageType MessageType;
+		public int MessageType;
 		public int? Channel;
 
 		public byte? Data1;
@@ -50,7 +50,7 @@ namespace AudioLib
 			if (data[0] < 0xF0) // Voice command
 			{
 				int type = (data[0] & 0xf0);
-				MessageType = (MidiMessageType)type;
+				MessageType = type;
 
 				Channel = data[0] & 0x0f;
 				Data1 = data[1];
@@ -67,7 +67,7 @@ namespace AudioLib
 			}
 			else // System command
 			{
-				MessageType = (MidiMessageType)data[0];
+				MessageType = data[0];
 				Channel = null;
 
 				Data1 = null;

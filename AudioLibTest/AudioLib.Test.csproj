@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="LUTTest.cs" />
     <Compile Include="MidiTest.cs" />
+    <Compile Include="PortMidiTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="TestTF.cs" />
     <Compile Include="VelocityMapTest.cs" />

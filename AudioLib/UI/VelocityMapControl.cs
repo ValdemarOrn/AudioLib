@@ -12,11 +12,20 @@ namespace AudioLib.UI
 	public partial class VelocityMapControl : UserControl
 	{
 		Pen darkBlue;
+		System.Drawing.Font font;
 
 		public VelocityMap Map;
 		
 		public double TriggerValue;
 		public Timer TriggerTimer;
+
+		double xmin { get { if (Map == null) return 0.0; return Map.XMin; } set { if (Map == null) return; Map.XMin = value; } }
+		double xmax { get { if (Map == null) return 1.0; return Map.XMax; } set { if (Map == null) return; Map.XMax = value; } }
+		double ymin { get { if (Map == null) return 0.0; return Map.YMin; } set { if (Map == null) return; Map.YMin = value; } }
+		double ymax { get { if (Map == null) return 1.0; return Map.YMax; } set { if (Map == null) return; Map.YMax = value; } }
+
+		double ZoomX { get { return (xmax - xmin); } }
+		double ZoomY { get { return (ymax - ymin); } }
 
 		public int InnerWidth
 		{
@@ -25,11 +34,13 @@ namespace AudioLib.UI
 
 		public int InnerHeight
 		{
-			get { return Height - 2; }
+			get { return Height - 21; }
 		}
 
 		public VelocityMapControl()
 		{
+			font = new Font(FontFamily.GenericSansSerif, 8.0f);
+
 			TriggerTimer = new Timer();
 			TriggerTimer.Interval = 500;
 			TriggerTimer.Tick += new EventHandler(StopTrigger);
@@ -42,6 +53,7 @@ namespace AudioLib.UI
 			InitializeComponent();
 		}
 
+		// Removes the trigger point from the UI
 		void StopTrigger(object sender, EventArgs e)
 		{
 			TriggerValue = -100;
@@ -49,11 +61,35 @@ namespace AudioLib.UI
 			Invalidate();
 		}
 
+		// paints the trigger point on the UI. 
+		// Starts a timer that fires in 500ms and clears the trigger off the screen ( StopTrigger() )
 		public void SetTrigger(double value)
 		{
 			TriggerTimer.Start();
 			TriggerValue = value;
 			Invalidate();
+		}
+
+		// Take a signal value, x and y, and return the pixel coordinates on the screen
+		Point GetScreenPos(double x1, double y1)
+		{
+			// map based on min and max values
+			x1 = (x1 - xmin) / (xmax - xmin);
+			y1 = (y1 - ymin) / (ymax - ymin);
+
+			// map onto graphics, by pixel
+			x1 = x1 * InnerWidth;
+			y1 = InnerHeight - y1 * InnerHeight;
+
+			return new Point(x1, y1);
+		}
+
+		Point FromScreenPos(double x, double y)
+		{
+			x = x / ((double)InnerWidth) * (xmax - xmin) + xmin;
+			y = (InnerHeight - y) / ((double)InnerHeight) * (ymax - ymin) + ymin;
+
+			return new Point(x, y);
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
@@ -67,94 +103,194 @@ namespace AudioLib.UI
 			if (Map == null)
 				return;
 
-			for (int i = 0; i < Map.NumberOfPoints - 1; i++)
+			// paint x,y coordinates of selected point
+			if (selectedPoint != -1)
 			{
-				double zoneSize = 1.0 / (Map.NumberOfPoints-1);
-
-				double x1 = zoneSize * i;
-				double y1 = Map.Values[i];
-
-				double x2 = zoneSize * (i+1);
-				double y2 = Map.Values[i + 1];
-
-				g.DrawLine(darkBlue, (float)(1 + x1 * InnerWidth), (float)(1 + (1 - y1) * InnerHeight), (float)(1 + x2 * InnerWidth), (float)(1 + (1 - y2) * InnerHeight));
+				g.DrawString(String.Format("X: {0:0.00}, Y: {1:0.00}", Map.GetX(selectedPoint), Map.GetY(selectedPoint)), font, Brushes.Black, 2, 2);
 			}
 
-			for (int i = 0; i < Map.NumberOfPoints; i++)
+			// paint the line leading into the first point
+			double x = Map.GetX(0);
+			double y = Map.GetY(0);
+			x = GetScreenPos(x, y).X;
+			y = GetScreenPos(x, y).Y;
+			g.DrawLine(darkBlue, (float)-10, (float)y, (float)x, (float)y);
+
+			// paint the line leading out of the last point
+			x = Map.GetX(Map.Count-1);
+			y = Map.GetY(Map.Count-1);
+			x = GetScreenPos(x, y).X;
+			y = GetScreenPos(x, y).Y;
+			g.DrawLine(darkBlue, (float)x, (float)y, (float)Width+10, (float)y);
+
+
+			// paint the output line
+			for (int i = 0; i < Map.Count - 1; i++)
 			{
-				double zoneSize = 1.0/(Map.NumberOfPoints-1);
-				float x = (float)(1 + (zoneSize * i) * InnerWidth);
+				double zoneSize = Map.GetX(i + 1) - Map.GetX(i);
 
-				float y = (float)(1 + (1 - Map.Map(zoneSize * i)) * InnerHeight);
-				g.DrawLine(Pens.Black, x, Height, x, y);
+				// get base values
+				double x1 = Map.GetX(i);
+				double y1 = Map.GetY(i);
 
-				if( i == selectedPoint)
-					g.FillEllipse(Brushes.Orange, x - 3, y - 3, 6, 6);
+				double x2 = Map.GetX(i) + zoneSize;
+				double y2 = Map.GetY(i + 1);
+
+				x1 = GetScreenPos(x1, y1).X;
+				y1 = GetScreenPos(x1, y1).Y;
+
+				x2 = GetScreenPos(x2, y2).X;
+				y2 = GetScreenPos(x2, y2).Y;
+
+				// paint lines
+				g.DrawLine(darkBlue, (float)x1, (float)y1, (float)x2, (float)y2);
+
+				// paint dots
+				if (i == selectedPoint)
+					g.FillEllipse(Brushes.Orange, (float)(x1 - 3), (float)(y1 - 3), 6, 6);
 				else
-					g.FillEllipse(Brushes.DarkBlue, x - 3, y - 3, 6, 6);
+					g.FillEllipse(Brushes.DarkBlue, (float)(x1 - 3), (float)(y1 - 3), 6, 6);
+
+				
 			}
 
+			// Paint the last point, we need to paint that extra because the loop doesn't cover the last point
+
+			// get base values
+			double xLast = Map.GetX(Map.Count-1);
+			double yLast = Map.GetY(Map.Count - 1);
+			xLast = GetScreenPos(xLast, yLast).X;
+			yLast = GetScreenPos(xLast, yLast).Y;
+			// paint dots
+			if (Map.Count-1 == selectedPoint)
+				g.FillEllipse(Brushes.Orange, (float)(xLast - 3), (float)(yLast - 3), 6, 6);
+			else
+				g.FillEllipse(Brushes.DarkBlue, (float)(xLast - 3), (float)(yLast - 3), 6, 6);
+			
+
+
+			// Paint trigger point
 			if (TriggerValue >= 0)
 			{
-				float x = (float)(1 + TriggerValue * InnerWidth);
-				float y = (float)(1 + (1 - Map.Map(TriggerValue)) * InnerHeight);
-				g.FillEllipse(Brushes.Red, x - 3, y - 3, 6, 6);
-				g.DrawLine(Pens.Red, x, Height, x, y);
+				// get base values
+				double x1 = TriggerValue;
+				double y1 = Map.Map(TriggerValue);
+
+				// map based on min and max values
+				x1 = (x1 - xmin) / (xmax - xmin);
+				y1 = (y1 - ymin) / (ymax - ymin);
+
+				// map onto graphics, by pixel
+				x1 = x1 * InnerWidth;
+				y1 = InnerHeight - y1 * InnerHeight;
+
+				g.FillEllipse(Brushes.Red, (float)(x1 - 3), (float)(y1 - 3), 6, 6);
+				g.DrawLine(Pens.Red, (float)x1, Height, (float)x1, (float)y1);
 			}
+
+			// draw limits
+			g.FillRectangle(Brushes.White, -10, InnerHeight, InnerWidth + 10, 40);
+			g.DrawLine(Pens.Black, -10, InnerHeight + 1, InnerWidth + 10, InnerHeight + 1);
+			g.DrawString(String.Format("{0:0.00}", xmin), font, Brushes.Black, 0 / 4.0f * InnerWidth + 4, InnerHeight + 3);
+			g.DrawString(String.Format("{0:0.00}", xmax), font, Brushes.Black, 1 / 4.0f * InnerWidth + 4, InnerHeight + 3);
+			g.DrawString(String.Format("{0:0.00}", ymin), font, Brushes.Black, 2 / 4.0f * InnerWidth + 4, InnerHeight + 3);
+			g.DrawString(String.Format("{0:0.00}", ymax), font, Brushes.Black, 3 / 4.0f * InnerWidth + 4, InnerHeight + 3);
 			
 		}
 
+		EditMode editMode;
 		int selectedPoint = -1;
 		bool mouseDown = false;
-		Point lastMousePoint;
+		System.Drawing.Point lastMousePoint;
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			if (Map == null)
 				return;
 
-			// If we are moving the point, chagne the values
+			double dx = lastMousePoint.X - e.Location.X;
+			double dy = lastMousePoint.Y - e.Location.Y;
+
 			if (mouseDown)
 			{
-				double dy = lastMousePoint.Y - e.Location.Y;
-				if (dy != 0)
+				// If we are moving the point, change the values
+				if (editMode == EditMode.point)
 				{
-					Map.Values[selectedPoint] += dy / Height;
+					if (dx != 0)
+					{
+						double val = Map.GetX(selectedPoint) - dx / Width * ZoomX;
+						Map.SetX(val, selectedPoint);
+					}
 
-					if (Map.Values[selectedPoint] > 1.0)
-						Map.Values[selectedPoint] = 1.0;
-
-					if (Map.Values[selectedPoint] < 0.0)
-						Map.Values[selectedPoint] = 0.0;
-
-					Invalidate();
+					if (dy != 0)
+					{
+						double val = Map.GetY(selectedPoint) + dy / Height * ZoomY;
+						Map.SetY(val, selectedPoint);
+					}
 				}
 
+				// Edit boundaries
+
+				if (editMode == EditMode.xmin)
+					xmin = xmin + dy * 0.01;
+				else if (editMode == EditMode.xmax)
+					xmax = xmax + dy * 0.01;
+				else if (editMode == EditMode.ymin)
+					ymin = ymin + dy * 0.01;
+				else if (editMode == EditMode.ymax)
+					ymax = ymax + dy * 0.01;
+
 				lastMousePoint = e.Location;
+				Invalidate();
 				return;
 			}
 
-			// mouse is not pressed, we are selecting a point
+			// ------------ mouse is not pressed ----------------
+
+			// Editing the maximums
+			if (e.Y > InnerHeight)
+			{
+				if(e.X < InnerWidth / 4)
+					editMode = EditMode.xmin;
+				else if ( e.X < InnerWidth / 2)
+					editMode = EditMode.xmax;
+				else if ( e.X < InnerWidth * (3.0/4.0))
+					editMode = EditMode.ymin;
+				else
+					editMode = EditMode.ymax;
+
+				if(selectedPoint != -1)
+					Invalidate();
+
+				selectedPoint = -1;
+				return;
+			}
+
+			// Editing the points
 
 			int x = e.X;
 
-			double zoneSize = 1.0 / (Map.NumberOfPoints - 1);
-			
-			double minProximity = Width * 100; // big number
+			double shortestDistance = 999999999999999;
 			int closestPoint = -1;
 
-			for (int i = 0; i < Map.NumberOfPoints; i++)
+			for (int i = 0; i < Map.Count; i++)
 			{
-				double pointX = zoneSize * i * Width;
-				if (Math.Abs(pointX - x) < minProximity)
+				var p = GetScreenPos(Map.GetX(i), Map.GetY(i));
+				double distance = Math.Sqrt( (e.X - p.X)*(e.X - p.X) + (e.Y - p.Y)*(e.Y - p.Y) );
+				if (distance < shortestDistance && distance < 10)
 				{
-					minProximity = Math.Abs(pointX - x);
+					shortestDistance = distance;
 					closestPoint = i;
 				}
 			}
 
 			int lastPoint = selectedPoint;
 			selectedPoint = closestPoint;
+
+			if (selectedPoint == -1)
+				editMode = EditMode.none;
+			else
+				editMode = EditMode.point;
 
 			if (lastPoint != selectedPoint)
 				Invalidate();
@@ -182,5 +318,46 @@ namespace AudioLib.UI
 
 			mouseDown = false;
 		}
+
+		protected override void OnMouseClick(MouseEventArgs e)
+		{
+			if (e.Button == System.Windows.Forms.MouseButtons.Right)
+			{
+				if (selectedPoint != -1)
+					Map.Remove(selectedPoint);
+				else
+				{
+					var p = FromScreenPos(e.X, e.Y);
+					Map.Add(p.X, p.Y);
+				}
+
+				Invalidate();
+			}
+		}
+
+		// --------------- internal structures ---------------
+
+		enum EditMode
+		{
+			xmin,
+			xmax,
+			ymin,
+			ymax,
+			point,
+			none
+		}
+
+		class Point
+		{
+			public double X, Y;
+
+			public Point(double x, double y)
+			{
+				X = x;
+				Y = y;
+			}
+		}
+
 	}
+
 }
