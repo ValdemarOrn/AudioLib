@@ -5,6 +5,7 @@ using System.Text;
 
 namespace AudioLib
 {
+	[Serializable]
 	public class VelocityMap
 	{
 		// The working area boundaries
@@ -78,14 +79,35 @@ namespace AudioLib
 			}
 		}
 
-		List<double> X;
-		List<double> Y;
+		public List<double> X;
+		public List<double> Y;
+
+		public VelocityMap(VelocityMap clone)
+		{
+			X = new List<double>();
+			Y = new List<double>();
+
+			XMin = clone.XMin;
+			YMin = clone.YMin;
+			XMax = clone.XMax;
+			YMax = clone.YMax;
+
+			foreach (var x in clone.X)
+				X.Add(x);
+			foreach (var y in clone.Y)
+				Y.Add(y);
+		}
+
+		public VelocityMap() : this(0)
+		{}
 
 		public VelocityMap(int numberOfPoints)
 		{
 			X = new List<double>();
 			Y = new List<double>();
 
+			XMin = 0.0;
+			YMin = 0.0;
 			XMax = 1.0;
 			YMax = 1.0;
 
@@ -100,11 +122,17 @@ namespace AudioLib
 
 		public double GetX(int i)
 		{
+			if (i >= X.Count)
+				return 0.0;
+
 			return X[i];
 		}
 
 		public double GetY(int i)
 		{
+			if (i >= Y.Count)
+				return 0.0;
+
 			return Y[i];
 		}
 
@@ -154,6 +182,9 @@ namespace AudioLib
 
 		public double Map(double input)
 		{
+			if (X.Count == 0 || Y.Count == 0)
+				return 0;
+
 			if (input >= X[X.Count - 1])
 				return Y[Y.Count - 1];
 			if (input <= X[0])
@@ -170,7 +201,5 @@ namespace AudioLib
 			double output = Y[zone] + ((input - X[zone])) * dy;
 			return output;
 		}
-
-
 	}
 }

@@ -14,7 +14,12 @@ namespace AudioLib.UI
 		Pen darkBlue;
 		System.Drawing.Font font;
 
-		public VelocityMap Map;
+		VelocityMap _map;
+		public VelocityMap Map
+		{
+			get { return _map; }
+			set { _map = value; Invalidate(); }
+		}
 		
 		public double TriggerValue;
 		public Timer TriggerTimer;
@@ -65,6 +70,7 @@ namespace AudioLib.UI
 		// Starts a timer that fires in 500ms and clears the trigger off the screen ( StopTrigger() )
 		public void SetTrigger(double value)
 		{
+			TriggerTimer.Stop();
 			TriggerTimer.Start();
 			TriggerValue = value;
 			Invalidate();
@@ -101,6 +107,9 @@ namespace AudioLib.UI
 			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
 			if (Map == null)
+				return;
+
+			if (Map.X.Count == 0 || Map.Y.Count == 0)
 				return;
 
 			// paint x,y coordinates of selected point
