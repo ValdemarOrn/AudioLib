@@ -53,7 +53,7 @@ namespace AudioLib
 		public double GetValue(double value)
 		{
 			value = value + bias;
-			if (!(value > min && value < max)) throw new ArgumentException("value is not between min and max. Value: " + value);
+			if (!(value >= min && value <= max)) throw new ArgumentException("value is not between min and max. Value: " + value);
 
 			double idx = (double)((value - min) / (max - min));
 			double output = Interpolate.Spline(idx, table);
