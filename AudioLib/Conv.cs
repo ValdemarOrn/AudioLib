@@ -4,19 +4,19 @@ using System.Text;
 
 namespace AudioLib
 {
-	public class Conv
+	public sealed class Convolution
 	{
 		private double[] response;
 		private double[] tail;
 
-		public Conv(double[] responseIn)
+		public Convolution(double[] responseIn)
 		{
 			this.response = responseIn;
 
 			this.tail = new double[this.response.Length - 1];
 		}
 
-		public void setResponse(double[] inResponse)
+		public void SetResponse(double[] inResponse)
 		{
 			this.response = inResponse;
 			this.tail = new double[this.response.Length - 1];
@@ -27,9 +27,9 @@ namespace AudioLib
 		 * @param input Input signal to be processed
 		 * @return processed signal <b>without</b> the "tail". output.length = input.length
 		 */
-		public double[] process(double[] input)
+		public double[] Process(double[] input)
 		{
-			double[] data = Conv.conv(this.response, input);
+			double[] data = Convolution.Conv(this.response, input);
 			double[] output = new double[input.Length];
 			double[] newTail = new double[tail.Length];
 
@@ -60,7 +60,7 @@ namespace AudioLib
 			return output;
 		}
 
-		public static double[] conv(double[] h, double[] g)
+		public static double[] Conv(double[] h, double[] g)
 		{
 			double[] output = new double[h.Length + g.Length - 1];
 

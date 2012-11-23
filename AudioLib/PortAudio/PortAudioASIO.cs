@@ -27,7 +27,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace AudioLib
+namespace AudioLib.PortAudioInterop
 {
 
 	/// <summary> PortAudio v.19 bindings for .NET - ASIO bindings </summary>

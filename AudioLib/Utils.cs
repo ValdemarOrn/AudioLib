@@ -5,8 +5,19 @@ using System.Text;
 
 namespace AudioLib
 {
-	public class Utils
+	public sealed class Utils
 	{
+		static Utils()
+		{
+			note2HzTable = new double[12801];
+			for(int i= 0; i<note2HzTable.Length; i++)
+				note2HzTable[i] = Note2Hz(i * 0.01);
+
+			TanhTable = new double[200001];
+			for (int i = 0; i < TanhTable.Length; i++)
+				TanhTable[i] = Math.Tanh(i * 0.0001 - 10.0);
+		}
+
 		public static double ExpResponse(double input)
 		{
 			return (double)(Math.Pow(20, input)-1)/19;
@@ -15,7 +26,6 @@ namespace AudioLib
 		public static double LogResponse(double input)
 		{
 			return 2f*input-(double)(Math.Pow(20, input)-1)/19;
-
 		}
 
 		public static double DB2gain(double input)
@@ -26,6 +36,49 @@ namespace AudioLib
 		public static double Gain2DB(double input)
 		{
 			return (double)(20*Math.Log10(input));
+		}
+
+		public static double Note2Hz(double note)
+		{
+			return Math.Pow(2, (note - 69.0) / 12.0) * 440.0;
+		}
+
+		static double[] note2HzTable;
+		public static double Note2HzLookup(double note)
+		{
+			if (note < 0)
+				note = 0.0;
+			else if(note >= 128.0)
+				note = 127.999;
+
+			int i = (int)(note * 100);
+			double between = note * 100 - i;
+
+			double output = note2HzTable[i] * (1.0 - between) + note2HzTable[i + 1] * between;
+			return output;
+		}
+
+		static double[] TanhTable;
+		public static double TanhLookup(double value)
+		{
+			value += 10.0;
+
+			if (value < 0.0)
+				return -1.0;
+			else if (value > 20.0)
+				return 1.0;
+
+			// floor
+			//int i = (int)(value * 10000);
+			//double output = TanhTable[i];
+			//return output;
+
+			// linear
+			int i = (int)(value * 10000);
+			double between = value * 10000 - i;
+
+			double output = TanhTable[i] * (1.0 - between) + TanhTable[i + 1] * between;
+			return output;
 		}
 
 		public static double[] Linspace(double min, double max, int num)
@@ -132,6 +185,55 @@ namespace AudioLib
 					input[i] = min;
 				else if (input[i] > max)
 					input[i] = max;
+			}
+		}
+
+		public static double[] Downsample(double[] input, int factor)
+		{
+			var output = input.Where((x, i) => i % factor == 0).ToArray();
+			return output;
+		}
+
+		public static double[] MovingAve(double[] input, int windowSize)
+		{
+			var output = new double[input.Length];
+			MovingAve(input, output, windowSize);
+			return output;
+		}
+
+		public static void MovingAve(double[] input, double[] output, int windowSize)
+		{
+			// if the windowSize is an even number, we add half of each end-value
+			bool even = (windowSize % 2) == 0;
+
+			if(even)
+				windowSize++;
+
+			int offset = (windowSize - 1) / 2;
+
+			for(int i=0; i < input.Length; i++)
+			{
+				output[i] = 0;
+
+				for(int k = 0; k < windowSize; k++)
+				{
+					int index = i + k - offset;
+					if(index < 0)
+						index = 0;
+					else if(index >= input.Length)
+						index = input.Length - 1;
+
+					if(even && (k == 0 || k == windowSize - 1))
+						output[i] += input[index] * 0.5;
+					else
+						output[i] += input[index];
+				}
+
+				if (even)
+					output[i] = output[i] / (windowSize - 1);
+				else
+					output[i] = output[i] / windowSize;
+				
 			}
 		}
 
@@ -304,6 +406,18 @@ namespace AudioLib
 			}
 
 			return output;
+		}
+
+		public static double Triangle(double phase)
+		{
+			phase = (phase + 0.25) % 1.0;
+			if (phase < 0.0)
+				phase += 1.0;
+
+			if (phase < 0.5)
+				return (1.0 - 2 * phase) * -2.0 - 1.0;
+			else
+				return 2 * (phase - 0.5) * -2.0 - 1.0;
 		}
 
 		public static double[] Triangle(int len, double mag)

@@ -12,9 +12,9 @@ namespace AudioLib
 	 * Warning: b[0] = b0, b[1] = b1, etc, so make sure array is not reversed
 	 * 
 	 */
-	public class Bilinear
+	public sealed class Bilinear
 	{
-		public static void transform(double[] b, double[] a, out double[] zb, out double[] za, double fs)
+		public static void Transform(double[] b, double[] a, out double[] zb, out double[] za, double fs)
 		{
 			// Make sure the lengths of a and b are equal, otherwise the transform breaks
 			// If one array is shorten than the other, we create a new one and pad it with zeros
@@ -49,19 +49,19 @@ namespace AudioLib
 			zb = new double[a.Length];
 
 			if(b.Length == 2)
-				Bilinear.sToZ1(b, a, zb, za, fs);
+				Bilinear.SToZ1(b, a, zb, za, fs);
 			else if(b.Length == 3)
-				Bilinear.sToZ2(b, a, zb, za, fs);
+				Bilinear.SToZ2(b, a, zb, za, fs);
 			else if(b.Length == 4)
-				Bilinear.sToZ3(b, a, zb, za, fs);
+				Bilinear.SToZ3(b, a, zb, za, fs);
 			else if(b.Length == 5)
-				Bilinear.sToZ4(b, a, zb, za, fs);
+				Bilinear.SToZ4(b, a, zb, za, fs);
 			else
-				Bilinear.supertransform(b, a, zb, za, fs);
+				Bilinear.Supertransform(b, a, zb, za, fs);
 		}
 
 
-		private static void sToZ1(double[] b, double[] a, double[] zb, double[] za, double fs)
+		private static void SToZ1(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			zb[1] = b[0] - 2 * b[1] * fs;	//z^0
 			zb[0] = b[0] + 2 * b[1] * fs;	//z^1
@@ -70,7 +70,7 @@ namespace AudioLib
 			za[0] = a[0] + 2 * a[1] * fs;	//z^1
 		}
 
-		private static void sToZ2(double[] b, double[] a, double[] zb, double[] za, double fs)
+		private static void SToZ2(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			double fs2 = fs * fs;
 
@@ -83,7 +83,7 @@ namespace AudioLib
 			za[0] = a[0] + 2 * a[1] * fs + 4 * a[2] * fs2;	//z^2
 		}
 
-		private static void sToZ3(double[] b, double[] a, double[] zb, double[] za, double fs)
+		private static void SToZ3(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			double fs2 = fs * fs;
 			double fs3 = fs * fs * fs;
@@ -100,7 +100,7 @@ namespace AudioLib
 			za[0] = a[0] + 2 * a[1] * fs + 4 * a[2] * fs2 + 8 * a[3] * fs3;	//z^3
 		}
 
-		private static void sToZ4(double[] b, double[] a, double[] zb, double[] za, double fs)
+		private static void SToZ4(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			double fs2 = fs * fs;
 			double fs3 = fs * fs * fs;
@@ -119,7 +119,7 @@ namespace AudioLib
 			za[0] = a[0] + 2 * a[1] * fs + 4 * a[2] * fs2 + 8 * a[3] * fs3 + 16 * a[4] * fs4;	//z4
 		}
 
-		private static void supertransform(double[] b, double[] a, double[] zb, double[] za, double fs)
+		private static void Supertransform(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			int numOfCoeffs = b.Length;
 			int order = numOfCoeffs - 1;
@@ -131,7 +131,7 @@ namespace AudioLib
 
 			for(int i=0; i<numOfCoeffs; i++)
 			{
-				polys[i] = Conv.conv(arrayPower(zplus1, order-i) , arrayPower(zminus1, i));
+				polys[i] = Convolution.Conv(ArrayPower(zplus1, order-i) , ArrayPower(zminus1, i));
 			}
 
 			for(int i=0; i<numOfCoeffs; i++)
@@ -155,11 +155,11 @@ namespace AudioLib
 		/// <param name="a">The coefficients of the polynomial</param>
 		/// <param name="n">The power to which to raise the polynomial</param>
 		/// <returns>The resulting polynomial coefficients after raising the poly to power-of-n</returns>
-		public static double[] arrayPower(double[] a, int n)
+		public static double[] ArrayPower(double[] a, int n)
 		{
 			double[] output = { 1f };
 			for (int i = 0; i < n; i++)
-				output = Conv.conv(output, a);
+				output = Convolution.Conv(output, a);
 
 			return output;
 		}

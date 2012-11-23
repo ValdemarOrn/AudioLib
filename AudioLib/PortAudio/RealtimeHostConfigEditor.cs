@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace AudioLib
+namespace AudioLib.PortAudioInterop
 {
 	
 	public partial class RealtimeHostConfigEditor : Form

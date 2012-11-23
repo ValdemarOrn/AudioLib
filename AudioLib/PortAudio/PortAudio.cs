@@ -27,7 +27,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace AudioLib
+namespace AudioLib.PortAudioInterop
 {
 
 	/**

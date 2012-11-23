@@ -1,11 +1,12 @@
-﻿using System;
+﻿using AudioLib.Modules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace AudioLib.TF
 {
-	public class Highpass1 : TransferVariable
+	public sealed class Highpass1 : TransferVariable
 	{
 		public const int P_FREQ = 0;
 
@@ -18,11 +19,11 @@ namespace AudioLib.TF
 			double[] a = new double[2];
 
 			// PRevent going over the Nyquist frequency
-			if (parameters[P_FREQ] >= fs / 2)
-				parameters[P_FREQ] = fs / 2;
+			if (parameters[P_FREQ] >= fs * 0.5)
+				parameters[P_FREQ] = fs * 0.499;
 
 			// Compensate for frequency in bilinear transform
-			float f = (float)(2.0f*fs*(Math.Tan((parameters[P_FREQ]*2*Math.PI)/(fs*2))));
+			float f = (float)(2.0 * fs * (Math.Tan((parameters[P_FREQ] * 2 * Math.PI) / (fs * 2))));
 			if (f == 0) f = 0.0001f; // prevent divByZero exception
 
 			b[0] = 2*fs;
@@ -31,11 +32,13 @@ namespace AudioLib.TF
 			a[0] = f+2*fs;
 			a[1] = f-2*fs;
 
-			// normalize
-			b[0] = b[0] / a[0];
-			b[1] = b[1] / a[0];
+			var aInv = 1 / a[0];
 
-			a[1] = a[1] / a[0];
+			// normalize
+			b[0] = b[0] * aInv;
+			b[1] = b[1] * aInv;
+
+			a[1] = a[1] * aInv;
 			a[0] = 1;
 
 			this.B = b;

@@ -74,6 +74,21 @@ namespace AudioLib.Plot
 
 	public class Plot
 	{
+		public static void ShowPlot(Line line)
+		{
+			ShowPlot(new List<Line>() { line });
+		}
+
+		public static void ShowPlot(Line lineA, Line lineB)
+		{
+			ShowPlot(new List<Line>() { lineA, lineB });
+		}
+
+		public static void ShowPlot(Line lineA, Line lineB, Line lineC)
+		{
+			ShowPlot(new List<Line>() { lineA, lineB, lineC });
+		}
+
 		public static void ShowPlot(List<Line> lines)
 		{
 			Form f = new Form();
@@ -171,7 +186,7 @@ namespace AudioLib.Plot
 						if (line.y[i] < yMin || line.y[i] > yMax )
 							continue;
 
-						g.FillEllipse(line.DotBrush, TransformX(line.x[i]) - 2.5f, TransformY(line.y[i]) - 2.5f, 5, 5);
+						g.FillEllipse(line.DotBrush, TransformX(line.x[i]) - 1.5f, TransformY(line.y[i]) - 1.5f, 3, 3);
 					}
 				}
 			}

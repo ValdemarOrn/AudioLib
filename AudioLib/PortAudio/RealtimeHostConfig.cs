@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AudioLib
+namespace AudioLib.PortAudioInterop
 {
 	public class RealtimeHostConfig
 	{

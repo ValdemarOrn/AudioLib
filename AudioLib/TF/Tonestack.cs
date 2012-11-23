@@ -1,11 +1,12 @@
-﻿using System;
+﻿using AudioLib.Modules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace AudioLib.TF
 {
-	public class Tonestack : TransferVariable
+	public sealed class Tonestack : TransferVariable
 	{
 		public const int P_BASS = 0;
 		public const int P_MID = 1;
@@ -33,7 +34,7 @@ namespace AudioLib.TF
 		 * @param M		Mid pot Value
 		 * @param B		Bass pot Value
 		 */
-		public void setComponents(double C1, double C2, double C3, double Ri, double Ro, double R2, double T, double M, double B)
+		public void setComponents(double C1, double C2, double C3, double Ri, double Ro, double R2, double treblePot, double midPot, double bassPot)
 		{
 			component[0] = C1;
 			component[1] = C2;
@@ -41,9 +42,9 @@ namespace AudioLib.TF
 			component[3] = Ri;
 			component[4] = Ro;
 			component[5] = R2;
-			component[6] = T;
-			component[7] = M;
-			component[8] = B;
+			component[6] = treblePot;
+			component[7] = midPot;
+			component[8] = bassPot;
 		}
 
 		public void setComponents(double[] vector)
@@ -104,7 +105,7 @@ namespace AudioLib.TF
 
 			double[] zb = new double[4];
 			double[] za = new double[4];
-			Bilinear.transform(sb, sa, out zb, out za, fs);
+			Bilinear.Transform(sb, sa, out zb, out za, fs);
 			this.B = zb;
 			this.A = za;
 		}

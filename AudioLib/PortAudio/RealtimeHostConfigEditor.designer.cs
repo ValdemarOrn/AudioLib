@@ -1,4 +1,4 @@
-﻿namespace AudioLib
+﻿namespace AudioLib.PortAudioInterop
 {
 	public partial class RealtimeHostConfigEditor
 	{

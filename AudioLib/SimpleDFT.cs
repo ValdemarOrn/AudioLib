@@ -5,22 +5,31 @@ using System.Text;
 
 namespace AudioLib
 {
-	public class SimpleDFT
+	public sealed class SimpleDFT
 	{
 		/// <summary>
 		/// Provides the Discrete Fourier Transform for a real-valued input signal
 		/// </summary>
 		/// <param name="input">the signal to transform</param>
-		/// <param name="partials">the maximum number of partials to calculate. If not value is given it defaults to input/2</param>
+		/// <param name="partials">the maximum number of partials to calculate. If no value is given it defaults to input.length / 2</param>
 		/// <returns>The Cos and Sin components of the signal, respectively</returns>
-		public static List<double[]> DFT(double[] input, int partials = 0)
+		public static Tuple<double[], double[]> DFT(double[] input, int partials = 0)
 		{
 			int len = input.Length;
-			double[] cosDFT = new double[len / 2 + 1];
-			double[] sinDFT = new double[len / 2 + 1];
 
 			if (partials == 0)
 				partials = len / 2;
+
+			double[] cosDFT = new double[partials + 1];
+			double[] sinDFT = new double[partials + 1];
+
+			bool odd = input.Length % 2 != 0;
+
+			double power;
+			if (odd && partials == len / 2)
+				power = 1.0 / (input.Length / 2 + 0.5);
+			else
+				power = 1.0 / (input.Length / 2);
 
 			for (int n = 0; n <= partials; n++)
 			{
@@ -29,80 +38,72 @@ namespace AudioLib
 
 				for (int i = 0; i < len; i++)
 				{
-					cos += input[i] * Math.Cos(2 * Math.PI * n / len * i);
-					sin += input[i] * Math.Sin(2 * Math.PI * n / len * i);
+					cos += input[i] * Math.Cos(2 * Math.PI * n / (double)len * i);
+					sin += input[i] * Math.Sin(2 * Math.PI * n / (double)len * i);
 				}
 
-				cosDFT[n] = (double)cos;
-				sinDFT[n] = (double)sin;
+				if (n == 0 || n == partials && !odd) // halve the power of the last partial
+				{
+					cosDFT[n] = cos * power * 0.5;
+					sinDFT[n] = sin * power * 0.5;
+				}
+				else
+				{
+					cosDFT[n] = cos * power;
+					sinDFT[n] = sin * power;
+				}
 			}
 
-			return new List<double[]>() { cosDFT, sinDFT };
+			return ToPolar(cosDFT, sinDFT);
+		}
+
+		private static Tuple<double[], double[]> ToPolar(double[] cos, double[] sin)
+		{
+			var length = new double[cos.Length];
+			var phase = new double[cos.Length];
+
+			for(int i = 0; i<length.Length; i++)
+			{
+				length[i] = Math.Sqrt(cos[i] * cos[i] + sin[i] * sin[i]);
+				phase[i] = Math.Atan2(sin[i], cos[i]);
+			}
+
+			return new Tuple<double[], double[]>(length, phase);
 		}
 
 		/// <summary>
-		/// Takes the real-valued Cos and Sin components of Fourier transformed signal and reconstructs the time-domain signal
+		/// Adds up all the waves to create a new waveform
 		/// </summary>
-		/// <param name="cos">Array of cos components, containing frequency components from 0 to pi. sin.Length must match cos.Length</param>
-		/// <param name="sin">Array of sin components, containing frequency components from 0 to pi. sin.Length must match cos.Length</param>
-		/// <param name="len">
-		/// The length of the output signal. 
-		/// If len < (partials-1)*2 then frequency data will be lost in the output signal. 
-		/// if no len parameter is given it defaults to (partials-1)*2
-		/// </param>
+		/// <param name="partials">Tuple containing length and phase components</param>
+		/// <param name="len">The length of the output signal.</param>
+		/// <param name="maxPartials">Limit the reconstructed wave to this many partials</param>
 		/// <returns>the real-valued time-domain signal</returns>
-		public static double[] IDFT(double[] cos, double[] sin, int len = 0)
+		public static double[] IDFT(Tuple<double[], double[]> partials, int len, int maxPartials = 0)
 		{
-			if (cos.Length != sin.Length) throw new ArgumentException("cos.Length and sin.Length bust match!");
+			var length = partials.Item1;
+			var phase = partials.Item2;
 
-			if (len == 0)
-				len = (cos.Length - 1) * 2;
+			if (maxPartials == 0)
+				maxPartials = phase.Length - 1;
+
+			if (phase.Length != phase.Length)
+				throw new ArgumentException("length and phase arrays must have same length");
 
 			double[] output = new double[len];
+			double lenDouble = len;
 
-			int partials = (sin.Length - 1);
-			if (partials > len / 2)
-				partials = len / 2;
-
-			for (int n = 0; n <= partials; n++)
+			for (int k = 0; k < phase.Length; k++)
 			{
-				var cos1 = cos[n];
-				var sin1 = sin[n];
-
-				var cos2 = cos1;
-				var sin2 = -sin1;
-
-				if (n == 0 || n == partials)
-				{
-					cos2 = 0;
-					sin2 = 0;
-				}
-
-				double tempcos1;
-				double tempsin1;
-				double tempcos2;
-				double tempsin2;
+				if (k > maxPartials)
+					break;
 
 				for (int i = 0; i < len; i++)
 				{
-					tempcos1 = Math.Cos(2 * Math.PI * n / ((double)len) * i);
-					tempsin1 = Math.Sin(2 * Math.PI * n / ((double)len) * i);
-
-					tempcos2 = Math.Cos(2 * Math.PI * (len-n) / ((double)len) * i);
-					tempsin2 = Math.Sin(2 * Math.PI * (len-n) / ((double)len) * i);
-
-					output[i] += tempcos1 * cos1 + tempcos2 * cos2 + tempsin1 * sin1 + tempsin2 * sin2;
+					output[i] += Math.Cos(i / lenDouble * k * 2 * Math.PI - phase[k]) * length[k];
 				}
 			}
 
-			double[] output2 = new double[output.Length];
-			double normal = 1.0 / output.Length;
-			for (int i = 0; i < len; i++)
-			{
-				output2[i] = (double)output[i] * normal;
-			}
-
-			return output2;
+			return output;
 		}
 	}
 }

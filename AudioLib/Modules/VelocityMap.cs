@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AudioLib
+namespace AudioLib.Modules
 {
 	[Serializable]
-	public class VelocityMap
+	public sealed class VelocityMap
 	{
 		// The working area boundaries
 		double _xmin, _xmax, _ymin, _ymax;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AudioLib
+namespace AudioLib.Midi
 {
-	public class MidiMessageType
+	public sealed class MessageType
 	{
 		public const int NoteOff			= 0x80;
 		public const int NoteOn				= 0x90;
@@ -29,9 +29,9 @@ namespace AudioLib
 		public const int Reset				= 0xFF;
 	}
 
-	public struct Midi
+	public struct MidiHelper
 	{
-		public int MessageType;
+		public int MsgType;
 		public int? Channel;
 
 		public byte? Data1;
@@ -41,7 +41,7 @@ namespace AudioLib
 
 		public byte[] Sysex;
 
-		public Midi(byte[] data)
+		public MidiHelper(byte[] data)
 		{
 			Data = data;
 
@@ -50,7 +50,7 @@ namespace AudioLib
 			if (data[0] < 0xF0) // Voice command
 			{
 				int type = (data[0] & 0xf0);
-				MessageType = type;
+				MsgType = type;
 
 				Channel = data[0] & 0x0f;
 				Data1 = data[1];
@@ -67,7 +67,7 @@ namespace AudioLib
 			}
 			else // System command
 			{
-				MessageType = data[0];
+				MsgType = data[0];
 				Channel = null;
 
 				Data1 = null;
@@ -78,7 +78,7 @@ namespace AudioLib
 				if (data.Length >= 2)
 					Data2 = data[2];
 
-				if (MessageType == MidiMessageType.Sysex)
+				if (MsgType == MessageType.Sysex)
 					Sysex = data;
 				else
 					Sysex = null;
@@ -91,9 +91,9 @@ namespace AudioLib
 		{
 			get
 			{
-				if (MessageType != MidiMessageType.NoteOn &&
-					MessageType != MidiMessageType.NoteOff &&
-					MessageType != MidiMessageType.Aftertouch)
+				if (MsgType != MessageType.NoteOn &&
+					MsgType != MessageType.NoteOff &&
+					MsgType != MessageType.Aftertouch)
 					return null; 
 
 				return Data1;
@@ -104,7 +104,7 @@ namespace AudioLib
 		{
 			get
 			{
-				if (MessageType != MidiMessageType.ControlChange)
+				if (MsgType != MessageType.ControlChange)
 					return null; 
 
 				return Data1;
@@ -115,7 +115,7 @@ namespace AudioLib
 		{
 			get
 			{
-				if (MessageType != MidiMessageType.ControlChange)
+				if (MsgType != MessageType.ControlChange)
 					return null;
 
 				return Data2;
@@ -126,8 +126,8 @@ namespace AudioLib
 		{
 			get
 			{
-				if (MessageType != MidiMessageType.NoteOn &&
-					MessageType != MidiMessageType.NoteOff)
+				if (MsgType != MessageType.NoteOn &&
+					MsgType != MessageType.NoteOff)
 					return null; 
 
 				return Data2;
@@ -138,7 +138,7 @@ namespace AudioLib
 		{
 			get
 			{
-				if (MessageType != MidiMessageType.Aftertouch)
+				if (MsgType != MessageType.Aftertouch)
 					return null; 
 
 				return Data2;
@@ -149,7 +149,7 @@ namespace AudioLib
 		{
 			get
 			{
-				if (MessageType != MidiMessageType.ProgramChange)
+				if (MsgType != MessageType.ProgramChange)
 					return null; 
 
 				return Data1;
@@ -160,7 +160,7 @@ namespace AudioLib
 		{
 			get
 			{
-				if (MessageType != MidiMessageType.ChannelPressure)
+				if (MsgType != MessageType.ChannelPressure)
 					return null; 
 
 				return Data1;
@@ -171,7 +171,7 @@ namespace AudioLib
 		{ 
 			get 
 			{
-				if (MessageType != MidiMessageType.PitchWheel)
+				if (MsgType != MessageType.PitchWheel)
 					return null;
 
 				return (short)((int)Data2 << 7 + (int)Data1);

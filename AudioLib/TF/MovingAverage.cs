@@ -1,11 +1,12 @@
-﻿using System;
+﻿using AudioLib.Modules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace AudioLib.TF
 {
-	public class MovingAverage : Transfer
+	public sealed class MovingAverage : Transfer
 	{
 		int _samples;
 		public int Samples

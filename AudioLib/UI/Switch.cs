@@ -23,12 +23,15 @@ namespace AudioLib.UI
 		}
 
 		public Brush Brush;
+		public Brush OffBrush;
+		public bool Invert;
 
 		public event ValueChangedEvent ValueChanged;
 
 		public Switch()
 		{
 			this.Brush = Brushes.Black;
+			this.OffBrush = Brushes.Black;
 			this.Width = 28;
 			this.Height = 50;
 			this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
@@ -59,12 +62,14 @@ namespace AudioLib.UI
 
 			g.DrawPath(p, gp);
 
-			System.Drawing.Brush bb = new SolidBrush(Color.FromArgb(128, new Pen(Brush).Color));
+			bool on = Value > 0.5;
+			if (Invert)
+				on = !on;
 
-			if(Value > 0.5)
+			if(on)
 				g.FillRectangle(Brush, 9, 10, 8, 10);
 			else
-				g.FillRectangle(bb, 9, 29, 8, 10);
+				g.FillRectangle(OffBrush, 9, 29, 8, 10);
 			
 		}
 

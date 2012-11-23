@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AudioLib
 {
-	public class Interpolate
+	public sealed class Interpolate
 	{
 		public static double Linear(double position, double[] data)
 		{
@@ -137,6 +137,12 @@ namespace AudioLib
 			return output;
 		}
 
+		/// <summary>
+		/// Calculates two quadratic curves and blends them together for a smooth transition between splines
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="data"></param>
+		/// <returns></returns>
 		public static double Spline(double position, double[] data)
 		{
 			double pos = position * (data.Length - 1);
