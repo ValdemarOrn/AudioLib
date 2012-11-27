@@ -3,17 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AudioLib.Modules
 {
 	public sealed class Ahdsr
 	{
-		public Ahdsr()
+		public Ahdsr(double samplerate)
 		{
+			Samplerate = samplerate;
 			// no sound at beginning
 			ReleasePosition = 100000;
 		}
+
+		public double Samplerate;
 
 		#region AHDSR properties 
 
@@ -92,15 +94,13 @@ namespace AudioLib.Modules
 
 		#endregion
 
-		public double Samplerate;
-
 		bool _gate;
 		public bool Gate
 		{
 			get { return _gate; }
 			set
 			{
-				if (_gate == value)
+				if (_gate == value && !Retrigger)
 					return;
 
 				// get current value before we change the gate
@@ -130,6 +130,11 @@ namespace AudioLib.Modules
 		/// Set to true for an exponential decay mode
 		/// </summary>
 		public bool ExponentialDecay;
+
+		/// <summary>
+		/// Set to true if the envelope should start from the beginning each time the Gate is set
+		/// </summary>
+		public bool Retrigger;
 
 		double _atkShape;
 		/// <summary>
@@ -227,26 +232,25 @@ namespace AudioLib.Modules
 
 		public double Process(double progressSamples)
 		{
-			// always advance position, even during release
-
-			if(Node == 0)
-				NodePosition += progressSamples / _attackSamples;
-			else if (Node == 1)
-				NodePosition += progressSamples / _holdSamples;
-			else if (Node == 2)
-				NodePosition += progressSamples / _decaySamples;
-			else if (Node == 3)
-				NodePosition = 0;
-
-			// transition into next node
-			if (NodePosition >= 1.0)
+			if (Gate)
 			{
-				NodePosition = 0.0;
-				Node++;
+				if (Node == 0)
+					NodePosition += progressSamples / _attackSamples;
+				else if (Node == 1)
+					NodePosition += progressSamples / _holdSamples;
+				else if (Node == 2)
+					NodePosition += progressSamples / _decaySamples;
+				else if (Node == 3)
+					NodePosition = 0;
+
+				// transition into next node
+				if (NodePosition >= 1.0)
+				{
+					NodePosition = 0.0;
+					Node++;
+				}
 			}
-			
-			// If release phase
-			if (!Gate)
+			else // release phase
 			{
 				ReleasePosition += progressSamples / _releaseSamples;
 			}

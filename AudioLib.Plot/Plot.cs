@@ -252,7 +252,7 @@ namespace AudioLib.Plot
 
 			if (panning)
 			{
-				if (Math.Abs(dx) > 20)
+				/*if (Math.Abs(dx) > 20)
 				{
 					int k = 23;
 				}
@@ -260,7 +260,7 @@ namespace AudioLib.Plot
 				if (Math.Abs(dy) > 20)
 				{
 					int k = 23;
-				}
+				}*/
 
 				double xScale = (xMax - xMin) / this.Width;
 				xMin += -xScale * dx;

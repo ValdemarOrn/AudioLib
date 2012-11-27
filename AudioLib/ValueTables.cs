@@ -103,6 +103,9 @@ namespace AudioLib
 			double dx = 0.25;
 			double idx = 0.5;
 
+			if (table == null)
+				return desiredValue;
+
 			bool decreasing = table[0] > table[table.Length - 1];
 
 			double sign = decreasing ? -1.0 : 1.0;
