@@ -50,6 +50,7 @@
     <Compile Include="Enumerations.cs" />
     <Compile Include="Interpolate.cs" />
     <Compile Include="Modules\Ahdsr.cs" />
+    <Compile Include="Modules\Biquad.cs" />
     <Compile Include="Modules\LFO.cs" />
     <Compile Include="Modules\LUT.cs" />
     <Compile Include="Midi.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Sequencer.cs" />
     <Compile Include="Modules\SequencerTrack.cs" />
+    <Compile Include="SampleFormats.cs" />
     <Compile Include="SimpleDFT.cs" />
     <Compile Include="Modules\SequencerStep.cs" />
     <Compile Include="TF\Combine.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="ValueTables.cs" />
     <Compile Include="Valve\Model.cs" />
     <Compile Include="Valve\Triode.cs" />
+    <Compile Include="WaveFiles.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PortAudio\RealtimeHostConfigEditor.resx">
