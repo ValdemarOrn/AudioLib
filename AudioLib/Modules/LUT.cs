@@ -36,6 +36,19 @@ namespace AudioLib.Modules
 			}
 		}
 
+		public void ReadRecord(double[] data)
+		{
+			Min = data[0];
+			Max = data[1];
+
+			Table = new double[(int)data[2]];
+
+			for (int i = 0; i < Table.Count() - 1; i++)
+			{
+				Table[i] = data[i + 3];
+			}
+		}
+
 		public void GetValuesInPlace(double[] input)
 		{
 			GetValues(input, input);

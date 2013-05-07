@@ -43,7 +43,7 @@ namespace AudioLib.Modules
 			}
 		}
 
-		NoteLength FreqSync;
+		//NoteLength FreqSync;
 
 		/*public void SetFreqSync(Sync value)
 		{

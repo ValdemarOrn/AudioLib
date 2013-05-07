@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AudioLib.Valve
 {
-	public struct ModelParameters
+	public class ModelParameters
 	{
 		public double Mu;
 		public double Ex;

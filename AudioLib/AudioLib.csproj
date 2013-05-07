@@ -82,6 +82,21 @@
     <Compile Include="TF\MovingAverage.cs" />
     <Compile Include="TF\Tonestack.cs" />
     <Compile Include="Modules\Transfer.cs" />
+    <Compile Include="UI\BitmapIndicator.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\BitmapKnob.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\BitmapSliderSimple.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\BitmapSwitch.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Splash.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UI\Switch.cs">
       <SubType>Component</SubType>
     </Compile>

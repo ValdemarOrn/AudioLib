@@ -66,9 +66,20 @@ namespace AudioLib.Valve
 			}
 		}
 
+		/*public double[] GenerateLookupTable(double vMin, double vMax, int sampleCount)
+		{
+			var output = new double[sampleCount];
+			var voltages = Utils.Linspace(vMin, vMax, sampleCount);
+			for (int i = 0; i < sampleCount; i++)
+			{
+				var current = SolveCurrent(voltages[i]);
+
+			}
+		}*/
+
 		/// <summary>
 		/// Simulates the effects of the diode in the Koren Model.
-		/// Saturates the ingput voltage when it enters saturation (Eg > 0)
+		/// Saturates the input voltage when it enters saturation (Eg > 0)
 		/// </summary>
 		/// <param name="Eg"></param>
 		/// <returns></returns>

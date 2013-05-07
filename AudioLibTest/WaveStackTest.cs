@@ -8,7 +8,7 @@ using AudioLib.Plot;
 
 namespace AudioLib.Test
 {
-	[TestFixture]
+	/*[TestFixture]
 	public class WaveStackTest
 	{	
 
@@ -50,5 +50,5 @@ namespace AudioLib.Test
 			w.GetSample(0.1f, 0.499f);
 			w.GetSample(0.1f, 0.3f);
 		}
-	}
+	}*/
 }

@@ -25,7 +25,7 @@ namespace AudioLib
 
 		public static double LogResponse(double input)
 		{
-			return 2f*input-(double)(Math.Pow(20, input)-1)/19;
+			return Math.Log(20 * input + 1) / Math.Log(21);
 		}
 
 		public static double DB2gain(double input)
@@ -148,6 +148,22 @@ namespace AudioLib
 		{
 			for(int i=0; i < input.Length; i++)
 				input[i] = input[i] * gain;
+		}
+
+		public static double[] Add(double[] input, double value)
+		{
+			double[] output = new double[input.Length];
+
+			for (int i = 0; i < input.Length; i++)
+				output[i] = input[i] + value;
+
+			return output;
+		}
+
+		public static void AddInPlace(double[] input, double value)
+		{
+			for (int i = 0; i < input.Length; i++)
+				input[i] = input[i] + value;
 		}
 
 		public static double[] Saturate(double[] input, double max)

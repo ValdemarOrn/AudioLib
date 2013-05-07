@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AudioLib.Plot;
 using AudioLib;
+using System.Windows.Forms;
 
 namespace AudioLib.Test
 {
@@ -11,10 +12,12 @@ namespace AudioLib.Test
 	{
 		static void Main(string[] args)
 		{
-			TubeTest1();
+			Application.Run(new Myform());
+
+			/*TubeTest1();
 			TubeTest2();
 			TubeTest3();
-			TubeTest4();
+			TubeTest4();*/
 		}
 
 		/// <summary>
@@ -135,7 +138,7 @@ namespace AudioLib.Test
 			var adjusted = new double[inp.Length];
 			for (int i = 1; i < adjusted.Length; i++)
 			{
-				var dx = inp[i] - feedb * lp.process(adjusted[i - 1]);
+				var dx = inp[i] - feedb * lp.Process(adjusted[i - 1]);
 				//var dx = inp[i] - feedb * adjusted[i-1];
 				dxline[i] = dx;
 				adjusted[i] = Amp(dx);

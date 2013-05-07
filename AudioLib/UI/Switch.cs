@@ -10,6 +10,13 @@ namespace AudioLib.UI
 {
 	public class Switch : Control
 	{
+		public enum SwitchMode
+		{
+			Click,
+			Toggle,
+			Momentary
+		}
+
 		double _value;
 
 		public double Value
@@ -17,6 +24,9 @@ namespace AudioLib.UI
 			get { return _value; }
 			set
 			{
+				if (_value == value)
+					return;
+
 				_value = value;
 				this.Invalidate();
 			}
@@ -25,11 +35,15 @@ namespace AudioLib.UI
 		public Brush Brush;
 		public Brush OffBrush;
 		public bool Invert;
+		public SwitchMode Mode;
 
-		public event ValueChangedEvent ValueChanged;
+		protected bool MouseIsDown = false;
+
+		public event Action<object, double> ValueChanged;
 
 		public Switch()
 		{
+			this.Mode = SwitchMode.Click;
 			this.Brush = Brushes.Black;
 			this.OffBrush = Brushes.Black;
 			this.Width = 28;
@@ -38,6 +52,7 @@ namespace AudioLib.UI
 			this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			this.SetStyle(ControlStyles.UserPaint, true);
 			this.Value = 0.0;
+			this.Cursor = Cursors.Hand;
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
@@ -66,6 +81,9 @@ namespace AudioLib.UI
 			if (Invert)
 				on = !on;
 
+			if (Mode == SwitchMode.Toggle)
+				on = on && MouseIsDown;
+
 			if(on)
 				g.FillRectangle(Brush, 9, 10, 8, 10);
 			else
@@ -73,19 +91,50 @@ namespace AudioLib.UI
 			
 		}
 
-
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
+			MouseIsDown = true;
 			base.OnMouseDown(e);
-			if (e.Button == System.Windows.Forms.MouseButtons.Left)
-			{
-				if (Value > 0.5)
-					Value = 0.0;
-				else Value = 1.0;
+			if (e.Button != System.Windows.Forms.MouseButtons.Left)
+				return;
 
-				this.Invalidate();
-				ValueChanged(this, Value);
+			double newVal = Value;
+
+			if (Mode == SwitchMode.Click || Mode == SwitchMode.Toggle)
+			{
+				if (newVal > 0.5)
+					newVal = 0.0;
+				else
+					newVal = 1.0;
 			}
+			else if (Mode == SwitchMode.Momentary)
+			{
+				newVal = 1.0;
+			}
+
+			if (newVal == Value)
+				return;
+
+			Value = newVal;
+
+			this.Invalidate();
+			if(ValueChanged != null)
+				ValueChanged(this, Value);
+		}
+
+		protected override void OnMouseUp(MouseEventArgs e)
+		{
+			MouseIsDown = false;
+			base.OnMouseUp(e);
+			if (e.Button != System.Windows.Forms.MouseButtons.Left)
+				return;
+
+			if (Mode == SwitchMode.Momentary)
+			{
+				Value = 0.0;
+			}
+
+			this.Invalidate();
 		}
 	}
 }

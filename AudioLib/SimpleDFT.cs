@@ -123,5 +123,50 @@ namespace AudioLib
 
 			return output;
 		}
+
+		/// <summary>
+		/// MaxPartials must be sorted from smallest to largest number of partials!
+		/// </summary>
+		/// <param name="partials"></param>
+		/// <param name="len"></param>
+		/// <param name="maxPartials"></param>
+		/// <returns></returns>
+		public static double[][] IDFTMulti(Pair<double[], double[]> partials, int sampleCount, int[] maxPartials)
+		{
+			double sampleCountDouble = sampleCount;
+			var length = partials.Item1;
+			var phase = partials.Item2;
+
+			if (phase.Length != phase.Length)
+				throw new ArgumentException("length and phase arrays must have same length");
+
+			double[][] output = new double[maxPartials.Length][];
+
+			for (int w = 0; w < maxPartials.Length; w++)
+			{
+				double[] wave = new double[sampleCount];
+				int startPartial = maxPartials[w];
+				if(w != 0)
+				{
+					Array.Copy(output[w - 1], wave, sampleCount);
+					startPartial = maxPartials[w - 1] + 1;
+				}
+
+				for (int k = startPartial; k < phase.Length; k++)
+				{
+					if (k > maxPartials[w])
+						break;
+
+					for (int i = 0; i < sampleCount; i++)
+					{
+						wave[i] += Math.Cos(i / sampleCountDouble * k * 2 * Math.PI - phase[k]) * length[k];
+					}
+				}
+
+				output[w] = wave;
+			}
+
+			return output;
+		}
 	}
 }

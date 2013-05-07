@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
 using AudioLib.Plot;
+using AudioLib.Modules;
 
 namespace AudioLib.Test
 {
@@ -31,7 +32,7 @@ namespace AudioLib.Test
 			{
 				wave[i] = ((i % 2000) < 1000) ? 1 : 0;
 			}
-			var output = tf.process(wave);
+			var output = tf.Process(wave);
 
 			Line l2 = new Line(Utils.Linspace(0, 2, wave.Length), wave); l2.LinePen = Pens.Blue;
 			Line l3 = new Line(Utils.Linspace(0, 2, output.Length), output); l3.LinePen = Pens.Red;
@@ -90,7 +91,7 @@ namespace AudioLib.Test
 
 			var s = new Stopwatch();
 			s.Restart();
-			var filtered = Conv.ConvSimpleCircular(saw, kernel);
+			var filtered = Convolution.ConvSimpleCircular(saw, kernel);
 			s.Stop();
 
 			//MessageBox.Show("Millisec: " + s.ElapsedMilliseconds);

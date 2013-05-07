@@ -14,7 +14,7 @@ namespace AudioLib.Test
 		[Test]
 		public void TestDFT()
 		{
-			double[] s = Utils.Square(128, 1.0f, 0.5f).Select(x => (double)x).ToArray();
+			/*double[] s = Utils.Square(128, 1.0f, 0.5f).Select(x => (double)x).ToArray();
 			//s = new double[4] { 0, 1, 0, 0 };
 			var d = SimpleDFT.DFT(s);
 
@@ -24,7 +24,7 @@ namespace AudioLib.Test
 				d[1][i] = 0.0;
 			}
 
-			var output = SimpleDFT.IDFT(d[0], d[1]);
+			var output = SimpleDFT.IDFT(d);
 
 			Line l2 = new Line(Utils.Linspace(0, 2, s.Length).Select(x => (double)x).ToArray(), s); 
 			l2.DotBrush = Brushes.Blue;
@@ -39,7 +39,7 @@ namespace AudioLib.Test
 			l3.DrawLine = true;
 
 			var list = new List<Line>() { l2, l3 };
-			Plot.Plot.ShowPlot(list);
+			Plot.Plot.ShowPlot(list);*/
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AudioLib.PortAudioInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -50,7 +51,7 @@ namespace AudioLib.RealtimHostExample
 					{
 						freq = Convert.ToDouble(input);
 					}
-					catch (Exception e)
+					catch (Exception)
 					{
 						Console.WriteLine("Unable to parse '" + input + "' as a number");
 					}

@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 
 namespace AudioLib.UI
 {
-	public class Knob : Control
+	public class BitmapSliderSimple : Control
 	{
 		double _value;
 
@@ -26,17 +26,16 @@ namespace AudioLib.UI
 		}
 
 		public double Speed { get; set; }
-
-		public Brush Brush;
-
 		public event Action<object, double> ValueChanged;
 
-		public Knob()
+		Bitmap Resource;
+
+		public BitmapSliderSimple(Bitmap resource)
 		{
+			Resource = resource;
 			Speed = 0.005;
-			this.Brush = Brushes.Black;
-			this.Width = 52;
-			this.Height = 50;
+			this.Width = Resource.Width;
+			this.Height = Resource.Height / 2;
 			this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 			this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			this.SetStyle(ControlStyles.UserPaint, true);
@@ -47,24 +46,14 @@ namespace AudioLib.UI
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			var g = e.Graphics;
-			
-			g.SmoothingMode = SmoothingMode.AntiAlias;
-			g.CompositingQuality = CompositingQuality.HighQuality;
 
-			Pen p = new Pen(Brush, 5);
-			p.SetLineCap(LineCap.Flat, LineCap.Flat, DashCap.Flat);
+			int drawLength = (int)(this.Width * Value);
 
-			g.DrawArc(p, 4, 4, 42, 42, 45, -270);
+			// draw base
+			g.DrawImage(Resource, new Rectangle(0, 0, Width, Height), 0, 0, Width, Height, GraphicsUnit.Pixel);
 
-			float vectorX = (float)Math.Cos(Rad(218) - Value * Rad(256));
-			float vectorY = (float)-Math.Sin(Rad(218) - Value * Rad(256));
-			g.DrawLine(p, 25 + 5*vectorX, 25 + 5*vectorY, 25f + 23f*vectorX, 25 + 23f*vectorY);
-			
-		}
-
-		double Rad(double deg)
-		{
-			return deg / 180.0 * Math.PI;
+			// draw active part
+			g.DrawImage(Resource, new Rectangle(0, 0, drawLength, Height), 0, Height, drawLength, Height, GraphicsUnit.Pixel);
 		}
 
 		bool editing;
@@ -92,7 +81,7 @@ namespace AudioLib.UI
 			base.OnMouseMove(e);
 			if (editing)
 			{
-				double dx = lastPos.Y - e.Location.Y;
+				double dx = e.Location.X - lastPos.X;
 
 				if (dx == 0)
 					return;
@@ -110,7 +99,7 @@ namespace AudioLib.UI
 				lastPos = e.Location;
 				this.Invalidate();
 
-				if(ValueChanged != null)
+				if (ValueChanged != null)
 					ValueChanged(this, Value);
 			}
 		}
