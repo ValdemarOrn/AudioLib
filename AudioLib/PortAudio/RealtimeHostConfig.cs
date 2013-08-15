@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
 namespace AudioLib.PortAudioInterop
 {
+	[Serializable]
 	public class RealtimeHostConfig
 	{
 		public RealtimeHostConfig()
@@ -34,12 +36,12 @@ namespace AudioLib.PortAudioInterop
 		internal PortAudio.PaStreamParameters inputParameters;
 		internal PortAudio.PaStreamParameters outputParameters;
 
-        internal IntPtr Stream;
+		internal IntPtr Stream;
 
-        /// <summary>
-        /// Gets or sets the samplerate that is used for the stream.
-        /// </summary>
-        public int Samplerate { get; set; }
+		/// <summary>
+		/// Gets or sets the samplerate that is used for the stream.
+		/// </summary>
+		public int Samplerate { get; set; }
 
 		public int NumberOfInputs  { get { return inputParameters.channelCount;  } set { inputParameters.channelCount  = value; } }
 		public int NumberOfOutputs { get { return outputParameters.channelCount; } set { outputParameters.channelCount = value; } }
@@ -89,8 +91,8 @@ namespace AudioLib.PortAudioInterop
 			}
 			set
 			{
-                if (Samplerate < 0)
-                    throw new Exception("Samplerate has not been set");
+				if (Samplerate < 0)
+					throw new Exception("Samplerate has not been set");
 
 				InputLatencyMs = value / Samplerate;
 				OutputLatencyMs = value / Samplerate;
@@ -102,8 +104,49 @@ namespace AudioLib.PortAudioInterop
 			get { int hostApiID = PortAudio.Pa_GetDeviceInfo(OutputDeviceID).hostApi; return PortAudio.Pa_GetHostApiInfo(hostApiID).name; }
 		}
 
+		public string Serialize()
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine("InputDeviceID=" + InputDeviceID);
+			sb.AppendLine("OutputDeviceID=" + OutputDeviceID);
+			sb.AppendLine("NumberOfInputs=" + NumberOfInputs);
+			sb.AppendLine("NumberOfOutputs=" + NumberOfOutputs);
+			sb.AppendLine("Samplerate=" + Samplerate);
+			sb.AppendLine("BufferSize=" + BufferSize);
+			return sb.ToString();
+		}
+
+		public static RealtimeHostConfig Deserialize(string serializedString)
+		{
+			try
+			{
+				var dict = serializedString
+					.Split('\n')
+					.Where(x => x.Contains('='))
+					.Select(x => x.Trim())
+					.ToDictionary(x => x.Split('=')[0].Trim(), x => x.Split('=')[1].Trim());
+
+				var conf = new RealtimeHostConfig();
+				conf.InputDeviceID = Convert.ToInt32(dict["InputDeviceID"]);
+				conf.OutputDeviceID = Convert.ToInt32(dict["OutputDeviceID"]);
+				conf.NumberOfInputs = Convert.ToInt32(dict["NumberOfInputs"]);
+				conf.NumberOfOutputs = Convert.ToInt32(dict["NumberOfOutputs"]);
+				conf.Samplerate = Convert.ToInt32(dict["Samplerate"]);
+				conf.BufferSize = Convert.ToUInt32(dict["BufferSize"]);
+				return conf;
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+
 		public static RealtimeHostConfig CreateConfig(RealtimeHostConfig config = null)
 		{
+			if (!PortAudio.Pa_IsInitialized)
+				PortAudio.Pa_Initialize();
+
 			var editor = new RealtimeHostConfigEditor();
 
 			if (config != null)

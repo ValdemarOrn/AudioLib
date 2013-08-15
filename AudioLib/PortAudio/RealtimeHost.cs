@@ -6,211 +6,228 @@ using System.Runtime.InteropServices;
 
 namespace AudioLib.PortAudioInterop
 {
-    public enum StreamState
-    {
-        Closed,
-        Open,
-        Stopped,
-        Started
-    }
+	public enum StreamState
+	{
+		Closed,
+		Open,
+		Stopped,
+		Started
+	}
 
-    public class RealtimeHost : IDisposable
-    {
-        private static RealtimeHost _host;
-        public static RealtimeHost Host
-        {
-            get
-            {
-                if (_host == null)
-                    _host = new RealtimeHost();
+	public unsafe class RealtimeHost : IDisposable
+	{
+		public delegate void ProcessDirectDelegate(float** ins, float** outs, int bufferSize);
 
-                return _host;
-            }
-        }
+		private static RealtimeHost _host;
+		public static RealtimeHost Host
+		{
+			get
+			{
+				if (_host == null)
+					_host = new RealtimeHost();
+				return _host;
+			}
+		}
 
-        /// <summary>
-        /// StreamState is used to determine the current state of the host. Before making changes to the configuration the state must be Closed.
-        /// </summary>
-        public StreamState StreamState { get; internal set; }
+		/// <summary>
+		/// StreamState is used to determine the current state of the host. Before making changes to the configuration the state must be Closed.
+		/// </summary>
+		public StreamState StreamState { get; internal set; }
 
-        /// <summary>
-        /// Configuration info for the PortAudio Stream. Note that it is not allowed to change parameters in the config unless the StreamState is Closed
-        /// </summary>
-        RealtimeHostConfig Config;
+		/// <summary>
+		/// Configuration info for the PortAudio Stream. Note that it is not allowed to change parameters in the config unless the StreamState is Closed
+		/// </summary>
+		RealtimeHostConfig Config;
 
-        private RealtimeHost()
-        {
-            PortAudio.Pa_Initialize();
-            StreamState = StreamState.Closed;
-        }
+		public IntPtr Stream { get { return Config.Stream; } }
 
-        public void Dispose()
-        {
-            PortAudio.Pa_Terminate();
-        }
+		private RealtimeHost()
+		{
+			if(!PortAudio.Pa_IsInitialized)
+				PortAudio.Pa_Initialize();
 
-        public void SetConfig(RealtimeHostConfig config)
-        {
-            if (config == null)
-                throw new ArgumentNullException();
+			StreamState = StreamState.Closed;
+		}
 
-            var originalState = StreamState;
+		public void Dispose()
+		{
+			PortAudio.Pa_Terminate();
+		}
 
-            if (StreamState == StreamState.Started)
-                StopStream();
-            if (StreamState == StreamState.Stopped)
-                CloseStream();
+		public void SetConfig(RealtimeHostConfig config)
+		{
+			if (config == null)
+				throw new ArgumentNullException();
 
-            if (StreamState != StreamState.Closed)
-                throw new Exception("Stream could not be closed, unable to change settings!");
+			var originalState = StreamState;
 
-            Config = config;
+			if (StreamState == StreamState.Started)
+				StopStream();
+			if (StreamState == StreamState.Stopped)
+				CloseStream();
 
-            if (originalState == StreamState.Started || originalState == StreamState.Open)
-                OpenStream();
+			if (StreamState != StreamState.Closed)
+				throw new Exception("Stream could not be closed, unable to change settings!");
 
-            if (originalState == StreamState.Started)
-                StartStream();
-        }
+			Config = config;
 
-        // ------ Properties from PortAudioConfig
+			if (originalState == StreamState.Started || originalState == StreamState.Open)
+				OpenStream();
 
-        public int Samplerate { get { return Config.Samplerate; } }
-        public int NumberOfInputs { get { return Config.NumberOfInputs; } }
-        public int NumberOfOutputs { get { return Config.NumberOfOutputs; } }
-        public string InputDeviceName { get { return Config.InputDeviceName; } }
-        public string OutputDeviceName { get { return Config.OutputDeviceName; } }
-        public UInt32 BufferSize { get { return Config.BufferSize; } }
-        public string APIName { get { return Config.APIName; } }
-        public double InputLatency { get { return Config.InputLatencyMs; } }
-        public double OutputLatency { get { return Config.OutputLatencyMs; } }
+			if (originalState == StreamState.Started)
+				StartStream();
+		}
 
-        // --------------------------------------
+		// ------ Properties from PortAudioConfig
 
-        public Action<float[][], float[][]> Process;
+		public int Samplerate { get { return Config.Samplerate; } }
+		public int NumberOfInputs { get { return Config.NumberOfInputs; } }
+		public int NumberOfOutputs { get { return Config.NumberOfOutputs; } }
+		public string InputDeviceName { get { return Config.InputDeviceName; } }
+		public string OutputDeviceName { get { return Config.OutputDeviceName; } }
+		public UInt32 BufferSize { get { return Config.BufferSize; } }
+		public string APIName { get { return Config.APIName; } }
+		public double InputLatency { get { return Config.InputLatencyMs; } }
+		public double OutputLatency { get { return Config.OutputLatencyMs; } }
 
-        PortAudio.PaStreamCallbackResult RealtimeCallback(IntPtr inputBuffer, IntPtr outputBuffer, uint framesPerBuffer, ref PortAudio.PaStreamCallbackTimeInfo timeInfo, PortAudio.PaStreamCallbackFlags statusFlags, IntPtr userData)
-        {
-            unsafe
-            {
-                float[][] Inputs = new float[NumberOfInputs][];
-                float[][] Outputs = new float[NumberOfOutputs][];
+		// --------------------------------------
 
-                // create input channels and copy data into them
-                for (int i = 0; i < NumberOfInputs; i++)
-                {
-                    float* inChannel = (float*)((float**)inputBuffer)[i];
-                    float[] inArr = new float[framesPerBuffer];
-                    Marshal.Copy((IntPtr)inChannel, inArr, 0, (int)framesPerBuffer);
+		/// <summary>
+		/// Makes the host use the Direct/unsafe delegate
+		/// </summary>
+		public bool UseDirectProcessing { get; set; }
 
-                    Inputs[i] = inArr;
-                }
+		public Action<float[][], float[][]> Process;
+		public ProcessDirectDelegate ProcessDirect;
 
-                // create empty output array
-                for (int i = 0; i < NumberOfOutputs; i++)
-                {
-                    float[] outArr = new float[framesPerBuffer];
-                    Outputs[i] = outArr;
-                }
+		PortAudio.PaStreamCallbackResult RealtimeCallback(IntPtr inputBuffer, IntPtr outputBuffer, uint framesPerBuffer, ref PortAudio.PaStreamCallbackTimeInfo timeInfo, PortAudio.PaStreamCallbackFlags statusFlags, IntPtr userData)
+		{
 
-                // Call the process function
-                Process(Inputs, Outputs);
+			if(UseDirectProcessing)
+			{
+				var ins = (float**)inputBuffer;
+				var outs = (float**)outputBuffer;
+				ProcessDirect(ins, outs, (int)framesPerBuffer);
+				return PortAudio.PaStreamCallbackResult.paContinue;
+			}
 
-                // Copy data back from managed array into native array
-                for (int i = 0; i < NumberOfOutputs; i++)
-                {
-                    float* outChannel = (float*)((float**)outputBuffer)[i];
-                    float[] outArr = Outputs[i];
-                    Marshal.Copy(outArr, 0, (IntPtr)outChannel, (int)framesPerBuffer);
-                }
+			float[][] Inputs = new float[NumberOfInputs][];
+			float[][] Outputs = new float[NumberOfOutputs][];
 
-                return PortAudio.PaStreamCallbackResult.paContinue;
-            }
-        }
+			// create input channels and copy data into them
+			for (int i = 0; i < NumberOfInputs; i++)
+			{
+				float* inChannel = (float*)((float**)inputBuffer)[i];
+				float[] inArr = new float[framesPerBuffer];
+				Marshal.Copy((IntPtr)inChannel, inArr, 0, (int)framesPerBuffer);
 
-        void StreamFinished(IntPtr userData)
-        {
-            Console.WriteLine("Exit");
-        }
+				Inputs[i] = inArr;
+			}
 
-        // ----------------------------- PortAudio Operations -----------------------------
+			// create empty output array
+			for (int i = 0; i < NumberOfOutputs; i++)
+			{
+				float[] outArr = new float[framesPerBuffer];
+				Outputs[i] = outArr;
+			}
 
-        PortAudio.PaStreamCallbackDelegate callbackDelegate;
-        PortAudio.PaStreamFinishedCallbackDelegate streamFinishedDelegate;
+			// Call the process function
+			Process(Inputs, Outputs);
 
-        public void OpenStream()
-        {
-            if (Config == null)
-                throw new Exception("Configuration settings have not been applied. You must first configure the host");
+			// Copy data back from managed array into native array
+			for (int i = 0; i < NumberOfOutputs; i++)
+			{
+				float* outChannel = (float*)((float**)outputBuffer)[i];
+				float[] outArr = Outputs[i];
+				Marshal.Copy(outArr, 0, (IntPtr)outChannel, (int)framesPerBuffer);
+			}
 
-            if (StreamState != StreamState.Closed)
-                throw new Exception("Trying to Open a stream that does not have State: Closed. State is " + StreamState.ToString());
+			return PortAudio.PaStreamCallbackResult.paContinue;
+		}
 
-            callbackDelegate = RealtimeCallback;
-            streamFinishedDelegate = StreamFinished;
+		void StreamFinished(IntPtr userData)
+		{
+			Console.WriteLine("Exit");
+		}
 
-            var err = PortAudio.Pa_OpenStream(
-                        out Config.Stream,
-                        ref Config.inputParameters,
-                        ref Config.outputParameters,
-                        Samplerate,
-                        BufferSize,
-                        (PortAudio.PaStreamFlags.paClipOff | PortAudio.PaStreamFlags.paDitherOff),
-                        callbackDelegate,
-                        new IntPtr(0)
-                );
+		// ----------------------------- PortAudio Operations -----------------------------
 
-            if (err != PortAudio.PaError.paNoError)
-                throw new Exception(PortAudio.Pa_GetErrorText(err));
+		PortAudio.PaStreamCallbackDelegate callbackDelegate;
+		PortAudio.PaStreamFinishedCallbackDelegate streamFinishedDelegate;
 
-            err = PortAudio.Pa_SetStreamFinishedCallback(Config.Stream, streamFinishedDelegate);
+		public void OpenStream()
+		{
+			if (Config == null)
+				throw new Exception("Configuration settings have not been applied. You must first configure the host");
 
-            if (err != PortAudio.PaError.paNoError)
-                throw new Exception(PortAudio.Pa_GetErrorText(err));
+			if (StreamState != StreamState.Closed)
+				throw new Exception("Trying to Open a stream that does not have State: Closed. State is " + StreamState.ToString());
 
-            StreamState = StreamState.Open;
-        }
+			callbackDelegate = RealtimeCallback;
+			streamFinishedDelegate = StreamFinished;
 
-        public void StartStream()
-        {
-            if (StreamState != StreamState.Open)
-                throw new Exception("Trying to Start a stream that does not have State: Open. State is " + StreamState.ToString());
+			var err = PortAudio.Pa_OpenStream(
+						out Config.Stream,
+						ref Config.inputParameters,
+						ref Config.outputParameters,
+						Samplerate,
+						BufferSize,
+						(PortAudio.PaStreamFlags.paClipOff | PortAudio.PaStreamFlags.paDitherOff),
+						callbackDelegate,
+						new IntPtr(0)
+				);
 
-            var err = PortAudio.Pa_StartStream(Config.Stream);
-            if (err != PortAudio.PaError.paNoError)
-                throw new Exception(PortAudio.Pa_GetErrorText(err));
+			if (err != PortAudio.PaError.paNoError)
+				throw new Exception(PortAudio.Pa_GetErrorText(err));
 
-            StreamState = StreamState.Started;
-        }
+			err = PortAudio.Pa_SetStreamFinishedCallback(Config.Stream, streamFinishedDelegate);
 
-        public void StopStream()
-        {
-            if (StreamState != StreamState.Started)
-                throw new Exception("Trying to Stop a stream that does not have State: Started. State is " + StreamState.ToString());
+			if (err != PortAudio.PaError.paNoError)
+				throw new Exception(PortAudio.Pa_GetErrorText(err));
 
-            if (Config == null)
-                return;
+			StreamState = StreamState.Open;
+		}
 
-            var err = PortAudio.Pa_StopStream(Config.Stream);
-            if (err != PortAudio.PaError.paNoError)
-                throw new Exception(PortAudio.Pa_GetErrorText(err));
+		public void StartStream()
+		{
+			if (StreamState != StreamState.Open)
+				throw new Exception("Trying to Start a stream that does not have State: Open. State is " + StreamState.ToString());
 
-            StreamState = StreamState.Stopped;
-        }
+			var err = PortAudio.Pa_StartStream(Config.Stream);
+			if (err != PortAudio.PaError.paNoError)
+				throw new Exception(PortAudio.Pa_GetErrorText(err));
 
-        public void CloseStream()
-        {
-            if (StreamState != StreamState.Stopped)
-                throw new Exception("Trying to Close a stream that does not have State: Stopped. State is " + StreamState.ToString());
+			StreamState = StreamState.Started;
+		}
 
-            if (Config == null)
-                return;
+		public void StopStream()
+		{
+			if (StreamState != StreamState.Started)
+				throw new Exception("Trying to Stop a stream that does not have State: Started. State is " + StreamState.ToString());
 
-            var err = PortAudio.Pa_CloseStream(Config.Stream);
-            if (err != PortAudio.PaError.paNoError)
-                throw new Exception(PortAudio.Pa_GetErrorText(err));
+			if (Config == null)
+				return;
 
-            StreamState = StreamState.Closed;
-        }
-    }
+			var err = PortAudio.Pa_StopStream(Config.Stream);
+			if (err != PortAudio.PaError.paNoError)
+				throw new Exception(PortAudio.Pa_GetErrorText(err));
+
+			StreamState = StreamState.Stopped;
+		}
+
+		public void CloseStream()
+		{
+			if (StreamState != StreamState.Stopped)
+				throw new Exception("Trying to Close a stream that does not have State: Stopped. State is " + StreamState.ToString());
+
+			if (Config == null)
+				return;
+
+			var err = PortAudio.Pa_CloseStream(Config.Stream);
+			if (err != PortAudio.PaError.paNoError)
+				throw new Exception(PortAudio.Pa_GetErrorText(err));
+
+			StreamState = StreamState.Closed;
+		}
+	}
 }

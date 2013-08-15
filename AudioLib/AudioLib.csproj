@@ -51,6 +51,7 @@
     <Compile Include="Interpolate.cs" />
     <Compile Include="Modules\Ahdsr.cs" />
     <Compile Include="Modules\Biquad.cs" />
+    <Compile Include="Modules\CascadeFilter.cs" />
     <Compile Include="Modules\LFO.cs" />
     <Compile Include="Modules\LUT.cs" />
     <Compile Include="Midi.cs" />

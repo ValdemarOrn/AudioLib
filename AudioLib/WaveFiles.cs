@@ -8,7 +8,7 @@ namespace AudioLib
 	/// <summary>
 	/// Function to read and write WAVE file format
 	/// </summary>
-	class WaveFiles
+	public class WaveFiles
 	{
 		#region Read Operations
 

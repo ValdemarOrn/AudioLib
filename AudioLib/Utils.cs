@@ -150,14 +150,18 @@ namespace AudioLib
 				input[i] = input[i] * gain;
 		}
 
-		public static double[] Add(double[] input, double value)
+		public static void Add(double[] input, double value)
 		{
-			double[] output = new double[input.Length];
-
 			for (int i = 0; i < input.Length; i++)
-				output[i] = input[i] + value;
+				input[i] += value;
+		}
 
-			return output;
+		public static void Add(double[] input, double[] addedSignal)
+		{
+			for (int i = 0; i < input.Length; i++)
+			{
+				input[i] += addedSignal[i];
+			}
 		}
 
 		public static void AddInPlace(double[] input, double value)
