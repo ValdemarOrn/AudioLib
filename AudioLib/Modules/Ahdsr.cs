@@ -29,7 +29,9 @@ namespace AudioLib.Modules
 		double HoldIncr;
 		double DecayIncr;
 		double ReleaseIncr;
-		double SustainAccLevel;
+
+		bool LastGate; // gate state last time we called process()
+		double ReleaseLevel;
 		
 		double Accumulator;
 		int Stage;
@@ -45,11 +47,11 @@ namespace AudioLib.Modules
 			Samplerate = samplerate;
 
 			Stage = StageRelease;
-			SetParameter(StageAttack, 1);
-			SetParameter(StageHold, 1);
-			SetParameter(StageDecay, 64);
-			SetParameter(StageSustain, 64);
-			SetParameter(StageRelease, 64);
+			SetParameter(StageAttack, 2);
+			SetParameter(StageHold, 2);
+			SetParameter(StageDecay, 200);
+			SetParameter(StageSustain, 0.5);
+			SetParameter(StageRelease, 30);
 		}
 		/*
 		#region Shapes
@@ -125,26 +127,16 @@ namespace AudioLib.Modules
 					releaseTable = ValueTables.Pow3;
 			}
 		}
-
-		/// <summary>
-		/// Says how far we have progressed from the previous node to the next.
-		/// Value in range 0...1
-		/// </summary>
-		double NodePosition;
-
-		/// <summary>
-		/// Says how far the release phase has progressed
-		/// Value in range 0...n (exponential decay)
-		/// </summary>
-		double ReleasePosition;
-
-		#endregion
 		*/
-		void SetParameter(int stage, double valueMillisOrLevel)
+
+		/// <summary>
+		/// Sets AHDSR parameters, in milliseconds (except for sustain, which is 0...1)
+		/// </summary>
+		public void SetParameter(int stage, double valueMillisOrLevel)
 		{
 			var value = valueMillisOrLevel;
 
-			double samples = value * Samplerate + 1; // add one to prevent /0
+			double samples = (value * 0.001) * Samplerate + 1; // add one to prevent /0
 			double inc = (1.0 / samples);
 
 			switch (stage)
@@ -155,14 +147,14 @@ namespace AudioLib.Modules
 					break;
 				case StageDecay:
 					Decay = value;
-					DecayIncr = samples;
-					// adjust decay rate to sustain level
-					DecayIncr = DecayIncr * (1 - Sustain);
+					DecayIncr = inc;
+					break;
+				case StageHold:
+					Hold = value;
+					HoldIncr = inc;
 					break;
 				case StageSustain:
 					Sustain = value;
-					SustainAccLevel = value;
-					SetParameter(StageDecay, Decay); // recalulate decay increment
 					break;
 				case StageRelease:
 					Release = value;
@@ -173,47 +165,77 @@ namespace AudioLib.Modules
 
 		public double Process(double sampleCount)
 		{
-			if (!Gate)
+			if (LastGate && !Gate) // turning gate off
+			{
+				ReleaseLevel = Output;
 				Stage = StageRelease;
-
-			double previous = Accumulator;
+				Accumulator = 0;
+			}
 
 			if (Stage == StageAttack)
 			{
 				Accumulator += AttackIncr * sampleCount;
 				if (Accumulator > 1)
 				{
+					Stage = StageHold;
+					Accumulator = (Accumulator - 1);
+				}
+			}
+			else if (Stage == StageHold)
+			{
+				Accumulator += HoldIncr * sampleCount;
+				if (Accumulator > 1)
+				{
 					Stage = StageDecay;
-					Accumulator = 1 - (Accumulator - 1);
+					Accumulator = (Accumulator - 1);
 				}
 			}
 			else if (Stage == StageDecay)
 			{
-				Accumulator -= (DecayIncr * sampleCount);
-				if (Accumulator < 0 || Accumulator <= SustainAccLevel)
+				Accumulator += DecayIncr * sampleCount;
+				if (Accumulator > 1)
 				{
 					Stage = StageSustain;
-					Accumulator = SustainAccLevel;
+					Accumulator = 0;
 				}
 			}
 			else if (Stage == StageSustain)
 			{
-				Accumulator = SustainAccLevel;
+				// do nothing
 			}
 			else if (Stage == StageRelease)
 			{
-				Accumulator -= (ReleaseIncr * sampleCount);
-				if (Accumulator < 0)
-				{
-					Accumulator = 0;
-				}
+				Accumulator += ReleaseIncr * sampleCount;
+				if (Accumulator > 1)
+					Accumulator = 1;
 
-				if (Gate)
+				if (!LastGate && Gate) // turning on
+				{
 					Stage = StageAttack;
+					Accumulator = Output;
+				}
 			}
 
-			Output = Accumulator;
+
+			if (Stage == StageAttack)
+				Output = Accumulator;
+			else if (Stage == StageHold)
+				Output = 1;
+			else if (Stage == StageDecay)
+				Output = (1 - Accumulator) * (1 - Sustain) + Sustain;
+			else if (Stage == StageSustain)
+				Output = Sustain;
+			else if (Stage == StageRelease)
+				Output = ReleaseLevel * (1 - Accumulator);
+
+			LastGate = Gate;
 			return Output;
+		}
+
+		public void Reset()
+		{
+			Stage = StageAttack;
+			Accumulator = 0;
 		}
 
 		// shape lookup tables for attack, decay and release curves

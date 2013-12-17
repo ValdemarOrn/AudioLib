@@ -34,6 +34,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -42,12 +44,14 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bilinear.cs" />
     <Compile Include="Conv.cs" />
     <Compile Include="CircularBuffer.cs" />
     <Compile Include="Enumerations.cs" />
+    <Compile Include="Infrastructure\Logging.cs" />
     <Compile Include="Interpolate.cs" />
     <Compile Include="Modules\Ahdsr.cs" />
     <Compile Include="Modules\Biquad.cs" />
@@ -115,6 +119,16 @@
     <Compile Include="Valve\Model.cs" />
     <Compile Include="Valve\Triode.cs" />
     <Compile Include="WaveFiles.cs" />
+    <Compile Include="WpfUi\Announcer.cs" />
+    <Compile Include="WpfUi\Knob2.xaml.cs">
+      <DependentUpon>Knob2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WpfUi\Spinner.xaml.cs">
+      <DependentUpon>Spinner.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WpfUi\WaveformView.xaml.cs">
+      <DependentUpon>WaveformView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PortAudio\RealtimeHostConfigEditor.resx">
@@ -122,6 +136,20 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Page Include="WpfUi\Knob2.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WpfUi\Spinner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WpfUi\WaveformView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

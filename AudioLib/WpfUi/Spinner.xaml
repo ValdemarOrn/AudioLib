@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="Audiolib.WpfUi.Spinner"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+			 x:Name="Main"
+             d:DesignHeight="20" d:DesignWidth="50"
+			 MouseDown="OnMouseDown" MouseUp="OnMouseUp" MouseMove="OnMouseMove" MouseDoubleClick="OnMouseDoubleClick" SnapsToDevicePixels="True">
+	<Grid>
+		<Rectangle SnapsToDevicePixels="{Binding ElementName=Main, Path=SnaptoDevicePixels}" Grid.Row="2" Grid.Column="2" Fill="Transparent" Stroke="{Binding ElementName=Main, Path=BorderBrush, FallbackValue=Black}" StrokeThickness="1" RadiusX="3" RadiusY="3" />
+		<Label Padding="0" Margin="0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" 
+               Foreground="{Binding ElementName=Main, Path=Foreground, FallbackValue=Black}"
+			   Content="{Binding ElementName=Main, Path=ValueText, FallbackValue=12.34}"/>
+	</Grid>
+</UserControl>

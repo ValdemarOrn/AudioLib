@@ -7,9 +7,15 @@ namespace AudioLib.Modules
 {
 	public sealed class CascadeFilter
 	{
+		public double Output;
+		public double[] OutputBuffer;
+
 		public double CutoffKnob;
 		public double CutoffModulation;
+		public double CutoffModulationEnv;
+
 		public double Resonance;
+		public double ResonanceModulation;
 
 		public double VX;
 		public double VA;
@@ -40,25 +46,37 @@ namespace AudioLib.Modules
 			}
 		}
 
-		public CascadeFilter(double samplerate)
+		public CascadeFilter(double samplerate, int bufferSize)
 		{
 			this.Samplerate = samplerate;
+			OutputBuffer = new double[bufferSize];
 			CutoffKnob = 1;
 			VD = 1;
 		}
 
 		public void UpdateCoefficients()
 		{
-			var value = CutoffKnob + CutoffModulation;
+			var value = CutoffKnob + CutoffModulation + CutoffModulationEnv;
+			if (value > 1)
+				value = 1;
+			else if (value < 0)
+				value = 0;
+
 			var cutoff = 10 + ValueTables.Get(value, ValueTables.Response3Dec) * 21000;
 			P = (1 - 2 * cutoff * _fsinv) * (1 - 2 * cutoff * _fsinv);
 		}
 
 		public double Process(double input)
 		{
+			var reso = Resonance + ResonanceModulation;
+			if (reso > 1)
+				reso = 1;
+			else if (reso < 0)
+				reso = 0;
+
 			for (int i = 0; i < oversample; i++)
 			{
-				double fb = Resonance * 4 * (Feedback - 0.5 * input);
+				double fb = reso * 5 * (Feedback - 0.5 * input);
 				double val = input - fb;
 				x = val;
 
@@ -72,13 +90,23 @@ namespace AudioLib.Modules
 				d = (1 - P) * val + P * d;
 				val = d;
 
-				Feedback = Utils.TanhLookup(val);
+				Feedback = Utils.TanhApprox(val);
 			}
 
-			Output = (VX * x + VA * a + VB * b + VC * c + VD * d);
+			Output = (VX * x + VA * a + VB * b + VC * c + VD * d) * (1 - reso * 0.5);
 			return Output;
 		}
 
-		public double Output;
+		public void Process(double[] input, double[] cutoffModulationEnv)
+		{
+			for(int i = 0; i < input.Length; i++)
+			{
+				CutoffModulationEnv = cutoffModulationEnv[i];
+				UpdateCoefficients();
+				OutputBuffer[i] = Process(input[i]);
+			}
+		}
+
+		
 	}
 }

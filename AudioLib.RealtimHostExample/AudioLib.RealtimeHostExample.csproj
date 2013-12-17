@@ -58,7 +58,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy $(SolutionDir)Binaries\portaudio.dll $(TargetDir)portaudio.dll /y</PostBuildEvent>
+    <PostBuildEvent>copy $(SolutionDir)Binaries\release\portaudio_x86.dll $(TargetDir)portaudio.dll /y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

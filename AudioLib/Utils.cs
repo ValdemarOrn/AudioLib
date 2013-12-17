@@ -74,11 +74,24 @@ namespace AudioLib
 			//return output;
 
 			// linear
-			int i = (int)(value * 10000);
-			double between = value * 10000 - i;
+			double v = value * 10000;
+			int i = (int)v;
+			double between = v - i;
 
 			double output = TanhTable[i] * (1.0 - between) + TanhTable[i + 1] * between;
 			return output;
+		}
+
+		public static double TanhApprox(double x)
+		{
+			double invert = x < 0.0 ? -1 : 1;
+			x = x * invert;
+
+			if (x > 2)
+				return invert;
+
+			double val = x - 0.25 * x * x;
+			return val * invert;
 		}
 
 		public static double[] Linspace(double min, double max, int num)
@@ -255,6 +268,18 @@ namespace AudioLib
 					output[i] = output[i] / windowSize;
 				
 			}
+		}
+
+		public static double[] Normalize(double[] wave)
+		{
+			var min = wave.Min();
+			var max = wave.Max();
+			var amplitude = max - min;
+			if(amplitude == 0)
+				return wave.Select(x => x).ToArray();
+
+			var ampInv = 1 / amplitude;
+			return wave.Select(x => (x - min) * ampInv * 2 - 1).ToArray();
 		}
 
 		/// <summary>

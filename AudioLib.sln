@@ -1,13 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioLib", "AudioLib\AudioLib.csproj", "{4905489D-6F81-4129-8780-744CED5B3269}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioLib.Test", "AudioLibTest\AudioLib.Test.csproj", "{76CA5788-74FB-461B-8DC1-DAC85D58E5EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioLib.Plot", "AudioLib.Plot\AudioLib.Plot.csproj", "{99A0F891-4567-4385-B478-37092C5C81F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioLib.RealtimHostExample", "AudioLib.RealtimHostExample\AudioLib.RealtimHostExample.csproj", "{A5655D6A-4334-4C64-823E-E3E0B86B06C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioLib.RealtimeHostExample", "AudioLib.RealtimHostExample\AudioLib.RealtimeHostExample.csproj", "{A5655D6A-4334-4C64-823E-E3E0B86B06C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -10,11 +10,45 @@ namespace AudioLib.Modules
 	{
 		public enum Wave
 		{
-			Sine,
+			None = 0,
+			Sine = 1,
 			Triangle,
 			Saw,
 			Ramp,
-			Pulse
+			Pulse,
+			SampleAndHold
+		}
+
+		public static Dictionary<Wave, string> WaveNames = new Dictionary<Wave, string>
+		{
+			{ Wave.None, "Constant" },
+			{ Wave.Sine, "Sine" },
+			{ Wave.Triangle, "Triangle" },
+			{ Wave.Saw, "Sawtooth" },
+			{ Wave.Ramp, "Ramp" },
+			{ Wave.Pulse, "Pulse" },
+			{ Wave.SampleAndHold, "Sample & hold" }
+		};
+
+		public static double GetSample(Wave selectedWave, double accumulator, double stepOrPWM)
+		{
+			switch (selectedWave)
+			{
+				case Wave.Ramp:
+					return 2 * accumulator - 1.0;
+				case Wave.Saw:
+					return 1.0 - 2 * accumulator;
+				case Wave.Sine:
+					return Math.Sin(accumulator * 2 * Math.PI);
+				case Wave.Pulse:
+					return (accumulator < stepOrPWM) ? 1.0 : -1.0;
+				case Wave.Triangle:
+					return Utils.Triangle(accumulator);
+				case Wave.SampleAndHold:
+					return Noise.Random[(int)stepOrPWM % Noise.Random.Length];
+				default:
+					return 0;
+			}
 		}
 
 		double _fs;
@@ -26,76 +60,53 @@ namespace AudioLib.Modules
 			{
 				_fs = value;
 				_fsInv = 1.0 / _fs;
-				FreqHz = FreqHz;
 			}
 		}
+
+		public double Output;
 
 		public Wave SelectedWave;
-
-		double _freqHz;
-		public double FreqHz
-		{
-			get { return _freqHz; }
-			set
-			{
-				_freqHz = value;
-				FreqRad = FreqHz * _fsInv;
-			}
-		}
-
-		//NoteLength FreqSync;
-
-		/*public void SetFreqSync(Sync value)
-		{
-
-		}*/
-
-		double FreqRad;
-		public double Phase;
-		public double StartPhase;
-		public double PulseWidth;
-		public bool GateReset;
+		public double FreqHz;
+		public double StartPhase; // 0...1
+		public double Shape; // PWM
 		public bool TempoSync;
 
-		public LFO()
-		{ 
-		
+		private double Accumulator;
+		private double Stepsize;
+		private double Step; // S&H Step
+
+		public LFO(double samplerate)
+		{
+			Samplerate = samplerate;
+			FreqHz = 0.5;
+			UpdateStepsize();
 		}
 
 		public void Reset()
 		{
-			Phase = StartPhase;
+			Accumulator = StartPhase;
 		}
 
-		public double Process(int samples)
+		public void UpdateStepsize()
 		{
-			var value = 0.0;
+			double increment = FreqHz * _fsInv;
+			Stepsize = increment;
+		}
 
-			switch(SelectedWave)
+		public double Process(int sampleCount)
+		{
+			Output = GetSample(SelectedWave, Accumulator, (SelectedWave == Wave.SampleAndHold) ? Step : Shape);
+
+			Accumulator += Stepsize * sampleCount;
+			if (Accumulator > 1)
 			{
-				case Wave.Ramp:
-					value = 2 * Phase - 1.0;
-					break;
-				case Wave.Saw:
-					value = 1.0 - 2 * Phase;
-					break;
-				case Wave.Sine:
-					value = Math.Sin(Phase * 2 * Math.PI);
-					break;
-				case Wave.Pulse:
-					value = (Phase < PulseWidth) ? 1.0 : -1.0;
-					break;
-				case Wave.Triangle:
-					value = Utils.Triangle(Phase);
-					break;
+				Accumulator -= 1;
+				Step++;
 			}
 
-			Phase += FreqRad;
-
-			Output = value;
 			return Output;
 		}
 
-		public double Output;
+		
 	}
 }
