@@ -30,7 +30,7 @@ namespace AudioLib.Modules
 			{ Wave.SampleAndHold, "Sample & hold" }
 		};
 
-		public static double GetSample(Wave selectedWave, double accumulator, double stepOrPWM)
+		public static double GetSample(Wave selectedWave, double accumulator, double stepOrPwm)
 		{
 			switch (selectedWave)
 			{
@@ -41,39 +41,28 @@ namespace AudioLib.Modules
 				case Wave.Sine:
 					return Math.Sin(accumulator * 2 * Math.PI);
 				case Wave.Pulse:
-					return (accumulator < stepOrPWM) ? 1.0 : -1.0;
+					return (accumulator < stepOrPwm) ? 1.0 : -1.0;
 				case Wave.Triangle:
 					return Utils.Triangle(accumulator);
 				case Wave.SampleAndHold:
-					return Noise.Random[(int)stepOrPWM % Noise.Random.Length];
+					return Noise.Random[(int)stepOrPwm % Noise.Random.Length];
 				default:
 					return 0;
 			}
 		}
 
-		double _fs;
-		double _fsInv;
-		public double Samplerate
-		{
-			get { return _fs; }
-			set
-			{
-				_fs = value;
-				_fsInv = 1.0 / _fs;
-			}
-		}
+		private double fs;
+		private double fsInv;
+		private double accumulator;
+		private double stepsize;
+		private double step; // S&H Step
 
 		public double Output;
-
 		public Wave SelectedWave;
 		public double FreqHz;
 		public double StartPhase; // 0...1
 		public double Shape; // PWM
 		public bool TempoSync;
-
-		private double Accumulator;
-		private double Stepsize;
-		private double Step; // S&H Step
 
 		public LFO(double samplerate)
 		{
@@ -82,26 +71,36 @@ namespace AudioLib.Modules
 			UpdateStepsize();
 		}
 
+		public double Samplerate
+		{
+			get { return fs; }
+			set
+			{
+				fs = value;
+				fsInv = 1.0 / fs;
+			}
+		}
+
 		public void Reset()
 		{
-			Accumulator = StartPhase;
+			accumulator = StartPhase;
 		}
 
 		public void UpdateStepsize()
 		{
-			double increment = FreqHz * _fsInv;
-			Stepsize = increment;
+			double increment = FreqHz * fsInv;
+			stepsize = increment;
 		}
 
 		public double Process(int sampleCount)
 		{
-			Output = GetSample(SelectedWave, Accumulator, (SelectedWave == Wave.SampleAndHold) ? Step : Shape);
+			Output = GetSample(SelectedWave, accumulator, (SelectedWave == Wave.SampleAndHold) ? step : Shape);
 
-			Accumulator += Stepsize * sampleCount;
-			if (Accumulator > 1)
+			accumulator += stepsize * sampleCount;
+			if (accumulator > 1)
 			{
-				Accumulator -= 1;
-				Step++;
+				accumulator -= 1;
+				step++;
 			}
 
 			return Output;

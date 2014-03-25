@@ -42,6 +42,9 @@ namespace Audiolib.WpfUi
 			// add change listeners to props
 			DependencyPropertyDescriptor prop = DependencyPropertyDescriptor.FromProperty(ValueProperty, this.GetType());
 			prop.AddValueChanged(this, (x, y) => SetValue(ValueTextProperty, FormattedValue));
+
+			prop = DependencyPropertyDescriptor.FromProperty(FormattingProperty, this.GetType());
+			prop.AddValueChanged(this, (x, y) => SetValue(ValueTextProperty, FormattedValue));
 		}
 
 		public double? Value

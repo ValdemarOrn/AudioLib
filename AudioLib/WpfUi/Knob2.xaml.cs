@@ -52,11 +52,13 @@ namespace Audiolib.WpfUi
 
 		private double internalValue;
 		private bool disableInternalUpdate;
+		private bool UpdatesEnabled;
 
 		private static Func<double, string> DefaultFormatter = x => string.Format(CultureInfo.InvariantCulture, "{0:0.00}", x);
 
 		public Knob2()
 		{
+			UpdatesEnabled = false;
 			ValueFormatter = DefaultFormatter;
 			Delta = 0.005;
 			InitializeComponent();
@@ -91,6 +93,7 @@ namespace Audiolib.WpfUi
 			prop = DependencyPropertyDescriptor.FromProperty(HeightProperty, this.GetType());
 			prop.AddValueChanged(this, (s, e) => Update());
 
+			UpdatesEnabled = true;
 			Update();
 		}
 
@@ -207,28 +210,28 @@ namespace Audiolib.WpfUi
 		public string Path1
 		{
 			//get { return "M 10,90 A 30,30 25 0 1 50,10"; }
-			get { return _path1; }
+			get { return _path1 ?? ""; }
 			private set { _path1 = value; NotifyChange(() => Path1); }
 		}
 
 		string _path2;
 		public string Path2
 		{
-			get { return _path2; }
+			get { return _path2 ?? ""; }
 			private set { _path2 = value; NotifyChange(() => Path2); }
 		}
 
 		string _path3;
 		public string Path3
 		{
-			get { return _path3; }
+			get { return _path3 ?? ""; }
 			private set { _path3 = value; NotifyChange(() => Path3); }
 		}
 
 		string _path4;
 		public string Path4
 		{
-			get { return _path4; }
+			get { return _path4 ?? ""; }
 			private set { _path4 = value; NotifyChange(() => Path4); }
 		}
 
@@ -238,8 +241,11 @@ namespace Audiolib.WpfUi
 			this.SendAnnouncement(caption, valueFormatter(Value), timeout);
 		}
 
-		private void Update()
+		public void Update()
 		{
+			if (!UpdatesEnabled)
+				return;
+
 			if (Value > Max)
 				Value = Max;
 			if (Value < Min)
@@ -254,7 +260,7 @@ namespace Audiolib.WpfUi
 			canvas.Width = width;
 			canvas.Height = height;
 			rect.Width = canvas.Width;
-			rect.Height = canvas.Height;
+			rect.Height = Height;
 
 			var half = width / 2;
 			var radius = half - padding;

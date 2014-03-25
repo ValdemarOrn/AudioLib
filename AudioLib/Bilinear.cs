@@ -20,7 +20,7 @@ namespace AudioLib
 			// If one array is shorten than the other, we create a new one and pad it with zeros
 			if(b.Length > a.Length)
 			{
-				double[] newA = new double[b.Length];
+				var newA = new double[b.Length];
 				for(int i=0; i < b.Length; i++)
 				{
 					if(i<a.Length)
@@ -32,7 +32,7 @@ namespace AudioLib
 			}
 			else if(a.Length > b.Length)
 			{
-				double[] newB = new double[a.Length];
+				var newB = new double[a.Length];
 				for(int i=0; i<a.Length; i++)
 				{
 					if(i<b.Length)
@@ -48,20 +48,28 @@ namespace AudioLib
 			za = new double[a.Length];
 			zb = new double[a.Length];
 
-			if(b.Length == 2)
-				Bilinear.SToZ1(b, a, zb, za, fs);
-			else if(b.Length == 3)
-				Bilinear.SToZ2(b, a, zb, za, fs);
-			else if(b.Length == 4)
-				Bilinear.SToZ3(b, a, zb, za, fs);
-			else if(b.Length == 5)
-				Bilinear.SToZ4(b, a, zb, za, fs);
-			else
-				Bilinear.Supertransform(b, a, zb, za, fs);
+			switch (b.Length)
+			{
+				case 2:
+					Bilinear.StoZ1(b, a, zb, za, fs);
+					break;
+				case 3:
+					Bilinear.StoZ2(b, a, zb, za, fs);
+					break;
+				case 4:
+					Bilinear.StoZ3(b, a, zb, za, fs);
+					break;
+				case 5:
+					Bilinear.StoZ4(b, a, zb, za, fs);
+					break;
+				default:
+					Bilinear.Supertransform(b, a, zb, za, fs);
+					break;
+			}
 		}
 
 
-		private static void SToZ1(double[] b, double[] a, double[] zb, double[] za, double fs)
+		public static void StoZ1(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			zb[1] = b[0] - 2 * b[1] * fs;	//z^0
 			zb[0] = b[0] + 2 * b[1] * fs;	//z^1
@@ -70,7 +78,7 @@ namespace AudioLib
 			za[0] = a[0] + 2 * a[1] * fs;	//z^1
 		}
 
-		private static void SToZ2(double[] b, double[] a, double[] zb, double[] za, double fs)
+		public static void StoZ2(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			double fs2 = fs * fs;
 
@@ -83,7 +91,7 @@ namespace AudioLib
 			za[0] = a[0] + 2 * a[1] * fs + 4 * a[2] * fs2;	//z^2
 		}
 
-		private static void SToZ3(double[] b, double[] a, double[] zb, double[] za, double fs)
+		public static void StoZ3(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			double fs2 = fs * fs;
 			double fs3 = fs * fs * fs;
@@ -100,7 +108,7 @@ namespace AudioLib
 			za[0] = a[0] + 2 * a[1] * fs + 4 * a[2] * fs2 + 8 * a[3] * fs3;	//z^3
 		}
 
-		private static void SToZ4(double[] b, double[] a, double[] zb, double[] za, double fs)
+		public static void StoZ4(double[] b, double[] a, double[] zb, double[] za, double fs)
 		{
 			double fs2 = fs * fs;
 			double fs3 = fs * fs * fs;

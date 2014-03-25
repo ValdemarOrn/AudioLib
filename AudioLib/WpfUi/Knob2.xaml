@@ -8,7 +8,7 @@
              d:DesignHeight="100" d:DesignWidth="100">
     <Grid>
         <Canvas x:Name="canvas" Width="100" Height="80" VerticalAlignment="Top" MouseDown="OnMouseDown" MouseMove="OnMouseMove" MouseUp="OnMouseUp">
-            <Rectangle x:Name="rect" Fill="Orange" Opacity="0" Width="100" Height="80" />
+            <Rectangle x:Name="rect" Fill="Orange" Opacity="0.0" Width="100" Height="80" />
             <Path StrokeThickness="{Binding ElementName=Main, Path=Thickness}" Stroke="{Binding ElementName=Main, Path=Brush1}" Data="{Binding ElementName=Main, Path=Path1}" />
             <Path StrokeThickness="{Binding ElementName=Main, Path=Thickness}" Stroke="{Binding ElementName=Main, Path=Brush2}" Data="{Binding ElementName=Main, Path=Path2}" />
             <Path StrokeThickness="{Binding ElementName=Main, Path=Thickness}" Stroke="{Binding ElementName=Main, Path=Brush3}" Data="{Binding ElementName=Main, Path=Path3}" />
