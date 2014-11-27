@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 
-namespace Audiolib.WpfUi
+namespace AudioLib.WpfUi
 {
 	public static class Announcer
 	{

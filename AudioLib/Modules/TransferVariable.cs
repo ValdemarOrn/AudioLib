@@ -18,7 +18,7 @@ namespace AudioLib.Modules
 
 		public virtual void SetParam(int paramNumber, double param)
 		{
-			if ( paramNumber < parameters.Length && paramNumber >= 0 )
+			if (paramNumber < parameters.Length && paramNumber >= 0)
 				parameters[paramNumber] = param;
 
 			Update();

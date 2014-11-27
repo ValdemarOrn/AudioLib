@@ -10,14 +10,14 @@ namespace AudioLib.PortMidiInterop
 	{
 		// ------------------------ Additions ------------------------
 
-		public static List<PmDeviceInfo> Devices
+		public static Dictionary<int, PmDeviceInfo> Devices
 		{
 			get
 			{
-				var devices = new List<PmDeviceInfo>();
+				var devices = new Dictionary<int, PmDeviceInfo>();
 				for (int i = 0; i < Pm_CountDevices(); i++)
 				{
-					devices.Add(Pm_GetDeviceInfo(i));
+					devices[i] = Pm_GetDeviceInfo(i);
 				}
 
 				return devices;

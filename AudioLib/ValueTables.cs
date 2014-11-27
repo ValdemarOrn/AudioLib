@@ -73,6 +73,27 @@ namespace AudioLib
 				Response3Dec[i] = Math.Pow(1000, x) / 1000.0;
 				Response4Dec[i] = Math.Pow(10000, x) / 10000.0;
 			}
+
+			for (int i = 1; i <= 4000; i++)
+			{
+				Response2Oct[i] = (Response2Oct[i] - Response2Oct[0]) / (1 - Response2Oct[0]);
+				Response3Oct[i] = (Response3Oct[i] - Response3Oct[0]) / (1 - Response3Oct[0]);
+				Response4Oct[i] = (Response4Oct[i] - Response4Oct[0]) / (1 - Response4Oct[0]);
+				Response5Oct[i] = (Response5Oct[i] - Response5Oct[0]) / (1 - Response5Oct[0]);
+				Response6Oct[i] = (Response6Oct[i] - Response6Oct[0]) / (1 - Response6Oct[0]);
+				Response2Dec[i] = (Response2Dec[i] - Response2Dec[0]) / (1 - Response2Dec[0]);
+				Response3Dec[i] = (Response3Dec[i] - Response3Dec[0]) / (1 - Response3Dec[0]);
+				Response4Dec[i] = (Response4Dec[i] - Response4Dec[0]) / (1 - Response4Dec[0]);
+			}
+
+			Response2Oct[0] = 0;
+			Response3Oct[0] = 0;
+			Response4Oct[0] = 0;
+			Response5Oct[0] = 0;
+			Response6Oct[0] = 0;
+			Response2Dec[0] = 0;
+			Response3Dec[0] = 0;
+			Response4Dec[0] = 0;
 		}
 
 		/// <summary>

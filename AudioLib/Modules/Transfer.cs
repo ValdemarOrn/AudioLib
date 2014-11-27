@@ -111,7 +111,7 @@ namespace AudioLib.Modules
 
 		public void Process(double[] input, double[] output)
 		{
-			if(true && a.Length == 2)
+			if(a.Length == 2)
 			{
 				for (int i = 0; i < input.Length; i++)
 				{

@@ -215,8 +215,7 @@ namespace AudioLib.Modules
 					Accumulator = Output;
 				}
 			}
-
-
+			
 			if (Stage == StageAttack)
 				Output = Accumulator;
 			else if (Stage == StageHold)

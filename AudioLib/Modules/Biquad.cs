@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace AudioLib.Modules
 {
@@ -51,8 +48,14 @@ namespace AudioLib.Modules
 			set
 			{
 				_gainDb = value;
-				gain = Math.Pow(10, value / 40);
+				gain = Math.Pow(10, value / 20);
 			}
+		}
+
+		public double Gain
+		{
+			get { return gain; }
+			set { gain = value; }
 		}
 
 		/// <summary>
@@ -84,7 +87,7 @@ namespace AudioLib.Modules
 			Samplerate = samplerate;
 
 			GainDB = 0.0;
-			Frequency = 0.5;
+			Frequency = samplerate / 4;
 			Q = 0.5;
 		}
 
@@ -153,12 +156,12 @@ namespace AudioLib.Modules
 					a2 = 1 - (alpha / gain);
 					break;
 				case FilterType.LowShelf:
-					b0 = gain * ((gain + 1) - (gain - 1) * cosOmega + 2 * Math.Sqrt(gain) * alpha);
+					b0 = gain * ((gain + 1) - (gain - 1) * cosOmega + 2 * sqrtGain * alpha);
 					b1 = 2 * gain * ((gain - 1) - (gain + 1) * cosOmega);
-					b2 = gain * ((gain + 1) - (gain - 1) * cosOmega - 2 * Math.Sqrt(gain) * alpha);
-					a0 = (gain + 1) + (gain - 1) * cosOmega + 2 * Math.Sqrt(gain) * alpha;
+					b2 = gain * ((gain + 1) - (gain - 1) * cosOmega - 2 * sqrtGain * alpha);
+					a0 = (gain + 1) + (gain - 1) * cosOmega + 2 * sqrtGain * alpha;
 					a1 = -2 * ((gain - 1) + (gain + 1) * cosOmega);
-					a2 = (gain + 1) + (gain - 1) * cosOmega - 2 * Math.Sqrt(gain) * alpha;
+					a2 = (gain + 1) + (gain - 1) * cosOmega - 2 * sqrtGain * alpha;
 					break;
 				case FilterType.HighShelf:
 					b0 = gain * ((gain + 1) + (gain - 1) * cosOmega + 2 * sqrtGain * alpha);
@@ -168,24 +171,6 @@ namespace AudioLib.Modules
 					a1 = 2 * ((gain - 1) - (gain + 1) * cosOmega);
 					a2 = (gain + 1) - (gain - 1) * cosOmega - 2 * sqrtGain * alpha;
 					break;
-				/**
-			case FilterType.LowShelf:
-				b0 = gain     * ((gain + 1) - (gain - 1) * cosOmega + beta * sinOmega);
-				b1 = 2 * gain * ((gain - 1) - (gain + 1) * cosOmega                  );
-				b2 = gain     * ((gain + 1) - (gain - 1) * cosOmega - beta * sinOmega);
-				a0 =            ((gain + 1) + (gain - 1) * cosOmega + beta * sinOmega);
-				a1 = -2       * ((gain - 1) + (gain + 1) * cosOmega                  );
-				a2 =            ((gain + 1) + (gain - 1) * cosOmega - beta * sinOmega);
-				break;
-			case FilterType.HighShelf:
-				b0 = gain      * ((gain + 1) + (gain - 1) * cosOmega + beta * sinOmega);
-				b1 = -2 * gain * ((gain - 1) + (gain + 1) * cosOmega                  );
-				b2 = gain      * ((gain + 1) + (gain - 1) * cosOmega - beta * sinOmega);
-				a0 =             ((gain + 1) - (gain - 1) * cosOmega + beta * sinOmega);
-				a1 = 2         * ((gain - 1) - (gain + 1) * cosOmega                  );
-				a2 =             ((gain + 1) - (gain - 1) * cosOmega - beta * sinOmega);
-				break;
-				 */
 			}
 
 			double g = 1 / a0;
@@ -221,5 +206,11 @@ namespace AudioLib.Modules
 		}
 
 		public double Output;
+
+		public void Process(double[] input, double[] output, int len)
+		{
+			for (int i = 0; i < len; i++)
+				output[i] = Process(input[i]);
+		}
 	}
 }

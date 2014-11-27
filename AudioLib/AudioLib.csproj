@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AudioLib</RootNamespace>
     <AssemblyName>AudioLib</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -33,6 +33,26 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -40,6 +60,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -51,6 +72,7 @@
     <Compile Include="Conv.cs" />
     <Compile Include="CircularBuffer.cs" />
     <Compile Include="Enumerations.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Infrastructure\Logging.cs" />
     <Compile Include="Interpolate.cs" />
     <Compile Include="Modules\Ahdsr.cs" />
@@ -59,7 +81,9 @@
     <Compile Include="Modules\LUT.cs" />
     <Compile Include="Midi.cs" />
     <Compile Include="Modules\Oscillator.cs" />
+    <Compile Include="Modules\RandomWalk.cs" />
     <Compile Include="Modules\TransferVariable.cs" />
+    <Compile Include="Modules\TwoPoleFilter.cs" />
     <Compile Include="Modules\VelocityMap.cs" />
     <Compile Include="Noise.cs" />
     <Compile Include="PortAttributes.cs" />
@@ -78,11 +102,13 @@
     <Compile Include="Modules\Sequencer.cs" />
     <Compile Include="Modules\SequencerTrack.cs" />
     <Compile Include="SampleFormats.cs" />
+    <Compile Include="ShaRandom.cs" />
     <Compile Include="SimpleDFT.cs" />
     <Compile Include="Modules\SequencerStep.cs" />
     <Compile Include="TF\Combine.cs" />
     <Compile Include="TF\Highpass1.cs" />
     <Compile Include="TF\Lowpass1.cs" />
+    <Compile Include="TF\LP1.cs" />
     <Compile Include="TF\MovingAverage.cs" />
     <Compile Include="TF\Tonestack.cs" />
     <Compile Include="Modules\Transfer.cs" />

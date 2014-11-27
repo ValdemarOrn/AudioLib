@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Audiolib.WpfUi
+namespace AudioLib.WpfUi
 {
 	/// <summary>
 	/// Interaction logic for Spinner.xaml
