@@ -22,20 +22,26 @@ namespace AudioLib.Modules
 			HighShelf
 		};
 
-		double _gainDb;
-		double _q;
-		double a0, a1, a2, b0, b1, b2;
-		double x1, x2, y, y1, y2;
-		double gain;
+		private double samplerate;
+		private double _gainDb;
+		private double _q;
+		private double a0, a1, a2, b0, b1, b2;
+		private double x1, x2, y, y1, y2;
+		private double gain;
 
 		public FilterType Type;
-
+		public double Output;
+		
 		/// <summary>
 		/// Cutoff / Center Frequency
 		/// </summary>
 		public double Frequency;
 
-		public double Samplerate;
+		public double Samplerate
+		{
+			get { return samplerate; }
+			set { samplerate = value; Update(); }
+		}
 
 		public double Slope;
 
@@ -55,7 +61,12 @@ namespace AudioLib.Modules
 		public double Gain
 		{
 			get { return gain; }
-			set { gain = value; }
+			set
+			{
+				if (value == 0)
+					value = 0.001; // -60dB
+				gain = value;
+			}
 		}
 
 		/// <summary>
@@ -205,12 +216,19 @@ namespace AudioLib.Modules
 			return Output;
 		}
 
-		public double Output;
-
 		public void Process(double[] input, double[] output, int len)
 		{
 			for (int i = 0; i < len; i++)
 				output[i] = Process(input[i]);
+		}
+
+		public void ClearBuffers()
+		{
+			y = 0;
+			x2 = 0;
+			y2 = 0;
+			x1 = 0;
+			y1 = 0;
 		}
 	}
 }

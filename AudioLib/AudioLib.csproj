@@ -108,7 +108,8 @@
     <Compile Include="TF\Combine.cs" />
     <Compile Include="TF\Highpass1.cs" />
     <Compile Include="TF\Lowpass1.cs" />
-    <Compile Include="TF\LP1.cs" />
+    <Compile Include="TF\Hp1.cs" />
+    <Compile Include="TF\Lp1.cs" />
     <Compile Include="TF\MovingAverage.cs" />
     <Compile Include="TF\Tonestack.cs" />
     <Compile Include="Modules\Transfer.cs" />
@@ -145,6 +146,9 @@
     <Compile Include="Valve\Triode.cs" />
     <Compile Include="WaveFiles.cs" />
     <Compile Include="WpfUi\Announcer.cs" />
+    <Compile Include="WpfUi\FlatToggleButton.xaml.cs">
+      <DependentUpon>FlatToggleButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WpfUi\Knob2.xaml.cs">
       <DependentUpon>Knob2.xaml</DependentUpon>
     </Compile>
@@ -162,6 +166,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Page Include="WpfUi\FlatToggleButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WpfUi\Knob2.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

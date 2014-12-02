@@ -40,5 +40,11 @@ namespace AudioLib
 		{
 			Array.Copy(source, dest, count);
 		}
+
+		public static void Zero(this double[] source)
+		{
+			for (int i = 0; i < source.Length; i++)
+				source[i] = 0;
+		}
 	}
 }

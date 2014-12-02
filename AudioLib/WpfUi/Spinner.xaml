@@ -6,10 +6,16 @@
              mc:Ignorable="d" 
 			 x:Name="Main"
              d:DesignHeight="20" d:DesignWidth="50"
+             Background="Transparent"
+             Cursor="SizeNS"
 			 MouseDown="OnMouseDown" MouseUp="OnMouseUp" MouseMove="OnMouseMove" MouseDoubleClick="OnMouseDoubleClick" SnapsToDevicePixels="True">
 	<Grid>
-		<Rectangle SnapsToDevicePixels="{Binding ElementName=Main, Path=SnaptoDevicePixels}" Grid.Row="2" Grid.Column="2" Fill="Transparent" Stroke="{Binding ElementName=Main, Path=BorderBrush, FallbackValue=Black}" StrokeThickness="1" RadiusX="3" RadiusY="3" />
+		<Rectangle SnapsToDevicePixels="{Binding ElementName=Main, Path=SnaptoDevicePixels}"
+                   Stroke="{Binding ElementName=Main, Path=BorderBrush, FallbackValue=Black}" StrokeThickness="1" RadiusX="3" RadiusY="3" 
+                   Fill="{Binding ElementName=Main, Path=Fill, FallbackValue=White}" />
 		<Label Padding="0" Margin="0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" 
+               FontFamily="{Binding ElementName=Main, Path=FontFamily}"
+               FontSize="{Binding ElementName=Main, Path=FontSize}"
                Foreground="{Binding ElementName=Main, Path=Foreground, FallbackValue=Black}"
 			   Content="{Binding ElementName=Main, Path=ValueText, FallbackValue=12.34}"/>
 	</Grid>

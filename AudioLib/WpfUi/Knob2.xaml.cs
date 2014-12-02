@@ -18,10 +18,6 @@ namespace AudioLib.WpfUi
 {
 	public partial class Knob2 : UserControl, INotifyPropertyChanged
 	{
-		public static readonly DependencyProperty CaptionProperty =
-			DependencyProperty.Register("Caption", typeof(string), typeof(Knob2), 
-			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-
 		public static readonly DependencyProperty ValueProperty =
 			DependencyProperty.Register("Value", typeof(double), typeof(Knob2), 
 			new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
@@ -45,10 +41,6 @@ namespace AudioLib.WpfUi
 		public static readonly DependencyProperty FillColorProperty =
 			DependencyProperty.Register("FillColor", typeof(Brush), typeof(Knob2), 
 			new FrameworkPropertyMetadata(Brushes.CornflowerBlue, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-
-		public static readonly DependencyProperty InnerPaddingProperty =
-			DependencyProperty.Register("InnerPadding", typeof(double), typeof(Knob2), 
-			new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
 		private double internalValue;
 		private bool disableInternalUpdate;
@@ -78,8 +70,6 @@ namespace AudioLib.WpfUi
 			prop.AddValueChanged(this, (s, e) => Update());
 			prop = DependencyPropertyDescriptor.FromProperty(MaxProperty, this.GetType());
 			prop.AddValueChanged(this, (s, e) => Update());
-			prop = DependencyPropertyDescriptor.FromProperty(InnerPaddingProperty, this.GetType());
-			prop.AddValueChanged(this, (s, e) => Update());
 			prop = DependencyPropertyDescriptor.FromProperty(ThicknessProperty, this.GetType());
 			prop.AddValueChanged(this, (s, e) => Update());
 
@@ -95,12 +85,6 @@ namespace AudioLib.WpfUi
 
 			UpdatesEnabled = true;
 			Update();
-		}
-
-		public string Caption
-		{
-			get { return (string)GetValue(CaptionProperty); }
-			set { SetValue(CaptionProperty, value); }
 		}
 
 		public double Value
@@ -138,13 +122,6 @@ namespace AudioLib.WpfUi
 			get { return (Brush)GetValue(FillColorProperty); }
 			set { SetValue(FillColorProperty, value); }
 		}
-
-		public double InnerPadding
-		{
-			get { return (double)GetValue(InnerPaddingProperty); }
-			set { SetValue(InnerPaddingProperty, value); }
-		}
-
 
 		private bool Selected { get; set; }
 		private Point MousePos { get; set; }
@@ -254,18 +231,19 @@ namespace AudioLib.WpfUi
 			var delta = (Value - Min) / (Max - Min);
 			var angle = delta * 360 * 0.75;
 
-			var padding = InnerPadding + Thickness / 2;
-			var width = Width;
-			var height = Height - 20;
+			var padding = Thickness / 2;
+			var size = Width <= Height ? Width : Height;
+			var width = size;
+			var height = size;
 			canvas.Width = width;
 			canvas.Height = height;
 			rect.Width = canvas.Width;
 			rect.Height = Height;
 
-			var half = width / 2;
+			double half = size / 2;
 			var radius = half - padding;
 
-			var midX = width / 2;
+			var midX = size / 2;
 			var midY = padding;
 
 			var startX = Math.Cos(225.0 / 360 * 2 * Math.PI) * radius + half;

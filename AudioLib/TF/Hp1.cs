@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AudioLib.TF
 {
-	public sealed class Lp1
+	public sealed class Hp1
 	{
 		// http://musicdsp.org/archive.php?classid=3#116
 
@@ -13,9 +13,10 @@ namespace AudioLib.TF
 		private double b0, a1;
 
 		public double Output;
+		private double lpOut;
 		private double cutoffHz;
 
-		public Lp1(float fs)
+		public Hp1(float fs)
 		{
 			this.fs = fs;
 		}
@@ -40,7 +41,7 @@ namespace AudioLib.TF
 
 			var x = 2 * Math.PI * cutoffHz / fs;
 			var nn = (2 - Math.Cos(x));
-			var alpha = nn - Math.Sqrt(nn * nn - 1); 
+			var alpha = nn - Math.Sqrt(nn * nn - 1);
 
 			a1 = alpha;
 			b0 = 1 - alpha;
@@ -48,14 +49,16 @@ namespace AudioLib.TF
 
 		public double Process(double input)
 		{
-			if (input == 0 && Output < 0.000000000001)
+			if (input == 0 && lpOut < 0.000000000001)
 			{
 				Output = 0;
 			}
 			else
 			{
-				Output = b0 * input + a1 * Output;
+				lpOut = b0 * input + a1 * lpOut;
+				Output = input - lpOut;
 			}
+
 			return Output;
 		}
 

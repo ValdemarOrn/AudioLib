@@ -5,16 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              x:Name="Main"
-             d:DesignHeight="100" d:DesignWidth="100">
+             d:DesignHeight="100" d:DesignWidth="140">
     <Grid>
-        <Canvas x:Name="canvas" Width="100" Height="80" VerticalAlignment="Top" MouseDown="OnMouseDown" MouseMove="OnMouseMove" MouseUp="OnMouseUp">
-            <Rectangle x:Name="rect" Fill="Orange" Opacity="0.0" Width="100" Height="80" />
+        <Canvas x:Name="canvas" Width="100" Height="100" VerticalAlignment="Top" HorizontalAlignment="Center" MouseDown="OnMouseDown" MouseMove="OnMouseMove" MouseUp="OnMouseUp">
+            <Rectangle x:Name="rect" Fill="Orange" Opacity="0.0" Width="100" Height="100" />
             <Path StrokeThickness="{Binding ElementName=Main, Path=Thickness}" Stroke="{Binding ElementName=Main, Path=Brush1}" Data="{Binding ElementName=Main, Path=Path1}" />
             <Path StrokeThickness="{Binding ElementName=Main, Path=Thickness}" Stroke="{Binding ElementName=Main, Path=Brush2}" Data="{Binding ElementName=Main, Path=Path2}" />
             <Path StrokeThickness="{Binding ElementName=Main, Path=Thickness}" Stroke="{Binding ElementName=Main, Path=Brush3}" Data="{Binding ElementName=Main, Path=Path3}" />
             <Path StrokeThickness="{Binding ElementName=Main, Path=Thickness}" Stroke="{Binding ElementName=Main, Path=FillColor}" Data="{Binding ElementName=Main, Path=Path4}" />
         </Canvas>
-
-        <Label Content="{Binding ElementName=Main, Path=Caption}" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
     </Grid>
 </UserControl>

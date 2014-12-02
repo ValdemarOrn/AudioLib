@@ -21,16 +21,19 @@ namespace AudioLib.WpfUi
 	/// </summary>
 	public partial class Spinner : UserControl
 	{
-		static internal DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double?), typeof(Spinner),
-			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+		static internal DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(Spinner),
+			new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
 		static internal DependencyProperty ValueTextProperty = DependencyProperty.Register("ValueText", typeof(string), typeof(Spinner));
 
-		static internal DependencyProperty FormattingProperty = DependencyProperty.Register("Formatting", typeof(Func<double?, string>), typeof(Spinner),
-			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+		static internal DependencyProperty FormatterProperty = DependencyProperty.Register("Formatter", typeof(string), typeof(Spinner),
+			new FrameworkPropertyMetadata("{0.00}", FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
 		static new internal DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(Spinner),
 				new FrameworkPropertyMetadata(new SolidColorBrush(Colors.Black), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+		static internal DependencyProperty FillProperty = DependencyProperty.Register("Fill", typeof(Brush), typeof(Spinner),
+				new FrameworkPropertyMetadata(new SolidColorBrush(Colors.White), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 		
 		public Spinner()
 		{
@@ -43,19 +46,19 @@ namespace AudioLib.WpfUi
 			DependencyPropertyDescriptor prop = DependencyPropertyDescriptor.FromProperty(ValueProperty, this.GetType());
 			prop.AddValueChanged(this, (x, y) => SetValue(ValueTextProperty, FormattedValue));
 
-			prop = DependencyPropertyDescriptor.FromProperty(FormattingProperty, this.GetType());
+			prop = DependencyPropertyDescriptor.FromProperty(FormatterProperty, this.GetType());
 			prop.AddValueChanged(this, (x, y) => SetValue(ValueTextProperty, FormattedValue));
 		}
 
-		public double? Value
+		public double Value
 		{
-			get { return (double?)base.GetValue(ValueProperty); }
+			get { return (double)GetValue(ValueProperty); }
 			set { SetValue(ValueProperty, value); }
 		}
 
 		public string ValueText
 		{
-			get { return (string)base.GetValue(ValueTextProperty); }
+			get { return (string)GetValue(ValueTextProperty); }
 			set { SetValue(ValueTextProperty, value); }
 		}
 
@@ -63,88 +66,98 @@ namespace AudioLib.WpfUi
 		{
 			get 
 			{
-				if (Formatting == null)
-					return string.Format(CultureInfo.InvariantCulture, "{0:0.000}", Value);
+				if (Formatter == null)
+					return Value.ToString("{0.000}", CultureInfo.InvariantCulture);
 				else
-					return Formatting(Value); 
+					return Value.ToString(Formatter, CultureInfo.InvariantCulture);
 			}
 		}
 
-		public Func<double?, string> Formatting
+		public string Formatter
 		{
-			get { return (Func<double?, string>)base.GetValue(FormattingProperty); }
+			get { return (string)base.GetValue(FormatterProperty); }
 			set 
-			{ 
-				SetValue(FormattingProperty, value);
+			{
+				SetValue(FormatterProperty, value);
 				ValueText = FormattedValue;
 			}
 		}
 
 		public new Brush BorderBrush
 		{
-			get { return (Brush)base.GetValue(BorderBrushProperty); }
+			get { return (Brush)GetValue(BorderBrushProperty); }
 			set { SetValue(BorderBrushProperty, value); }
 		}
 
+		public Brush Fill
+		{
+			get { return (Brush)GetValue(FillProperty); }
+			set { SetValue(FillProperty, value); }
+		}
+
+		public int Sensitivity { get; set; }
 		public double Delta { get; set; }
 		public double Min { get; set; }
 		public double Max { get; set; }
 		public double Default { get; set; }
 
-		bool Selected;
-		Point MousePos;
+		private bool isSelected;
+		private Point? mousePosStart;
+		private double valueStart;
 
 		private void OnMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			if (Mouse.LeftButton == MouseButtonState.Released)
 				return;
 
-			Selected = true;
+			isSelected = true;
 			Mouse.Capture(this);
-			MousePos = e.GetPosition(this);
+			mousePosStart = e.GetPosition(this);
+			valueStart = Value;
 		}
 
 		private void OnMouseUp(object sender, MouseButtonEventArgs e)
 		{
-			Selected = false;
+			isSelected = false;
 			Mouse.Capture(null);
-			MousePos = e.GetPosition(this);
+			mousePosStart = null;
 		}
 
 		private void OnMouseMove(object sender, MouseEventArgs e)
 		{
 			if (Mouse.LeftButton == MouseButtonState.Released)
 			{
-				Selected = false;
+				isSelected = false;
 				Mouse.Capture(null);
-				MousePos = e.GetPosition(this);
+				mousePosStart = null;
 				return;
 			}
 
-			var oldPos = MousePos;
-			MousePos = e.GetPosition(this);
-
-			if (!Selected)
+			if (!isSelected || !mousePosStart.HasValue)
 				return;
 
-			var dx = oldPos.Y - MousePos.Y;
+			var curentPos = e.GetPosition(this);
+			double dx = (int)((mousePosStart.Value.Y - curentPos.Y) / Sensitivity);
 
-			if (Math.Abs(dx) < 0.5)
+			if (Math.Abs(dx) < 1.0)
 				return;
 
 			if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
 				dx *= 0.1;
 
-			var oldVal = Value ?? 0.0;
-			var val = oldVal + Delta * dx;
+			var val = valueStart + Delta * dx;
 
 			if (val < Min)
 				val = Min;
 			else if (val > Max)
 				val = Max;
 
-			if (val != oldVal)
+			if (val != valueStart)
+			{
 				Value = val;
+				valueStart = val;
+				mousePosStart = curentPos;
+			}
 		}
 
 		private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
