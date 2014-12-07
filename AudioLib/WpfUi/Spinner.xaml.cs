@@ -21,18 +21,18 @@ namespace AudioLib.WpfUi
 	/// </summary>
 	public partial class Spinner : UserControl
 	{
-		static internal DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(Spinner),
+		static public DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(Spinner),
 			new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-		static internal DependencyProperty ValueTextProperty = DependencyProperty.Register("ValueText", typeof(string), typeof(Spinner));
+		static public DependencyProperty ValueTextProperty = DependencyProperty.Register("ValueText", typeof(string), typeof(Spinner));
 
-		static internal DependencyProperty FormatterProperty = DependencyProperty.Register("Formatter", typeof(string), typeof(Spinner),
+		static public DependencyProperty FormatterProperty = DependencyProperty.Register("Formatter", typeof(string), typeof(Spinner),
 			new FrameworkPropertyMetadata("{0.00}", FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-		static new internal DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(Spinner),
+		static new public DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(Spinner),
 				new FrameworkPropertyMetadata(new SolidColorBrush(Colors.Black), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-		static internal DependencyProperty FillProperty = DependencyProperty.Register("Fill", typeof(Brush), typeof(Spinner),
+		static public DependencyProperty FillProperty = DependencyProperty.Register("Fill", typeof(Brush), typeof(Spinner),
 				new FrameworkPropertyMetadata(new SolidColorBrush(Colors.White), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 		
 		public Spinner()
