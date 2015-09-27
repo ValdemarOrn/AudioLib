@@ -23,7 +23,6 @@ namespace AudioLib.Modules
 		};
 
 		private double samplerate;
-		private double _gainDb;
 		private double _q;
 		private double a0, a1, a2, b0, b1, b2;
 		private double x1, x2, y, y1, y2;
@@ -50,10 +49,12 @@ namespace AudioLib.Modules
 		/// </summary>
 		public double GainDB
 		{
-			get { return _gainDb; }
+			get
+			{
+				return Math.Log10(gain) * 20;
+			}
 			set
 			{
-				_gainDb = value;
 				gain = Math.Pow(10, value / 20);
 			}
 		}
@@ -121,8 +122,6 @@ namespace AudioLib.Modules
 			{
 				alpha = sinOmega / (2 * Q);
 			}
-
-			//double beta = Math.Sqrt(gain + gain);
 
 			switch (Type)
 			{

@@ -25,17 +25,20 @@ namespace AudioLib.WpfUi
 			new FrameworkPropertyMetadata(new SolidColorBrush(Colors.Black), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
 		static new internal DependencyProperty BackgroundProperty = DependencyProperty.Register("Background", typeof(Brush), typeof(FlatToggleButton),
-			new FrameworkPropertyMetadata(new SolidColorBrush(Colors.Red), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+			new FrameworkPropertyMetadata(new SolidColorBrush(Colors.White), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
 		static internal DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(FlatToggleButton),
 				new FrameworkPropertyMetadata("Off", FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+		private string textOn;
+		private string textOff;
 
 		public FlatToggleButton()
 		{
 			InitializeComponent();
 
 			DependencyPropertyDescriptor prop = DependencyPropertyDescriptor.FromProperty(IsCheckedProperty, this.GetType());
-			prop.AddValueChanged(this, (x, y) => SetValue(TextProperty, IsChecked.GetValueOrDefault() ? "On" : "Off"));
+			prop.AddValueChanged(this, (x, y) => SetValue(TextProperty, IsChecked.GetValueOrDefault() ? TextOn ?? "On" : TextOff ?? "Off"));
 		}
 
 		public new Brush Background
@@ -53,6 +56,34 @@ namespace AudioLib.WpfUi
 		public string Text
 		{
 			get { return (string)base.GetValue(TextProperty); }
+		}
+
+		public string TextOn
+		{
+			get
+			{
+				return textOn;
+			}
+			set
+			{
+				textOn = value;
+				if (IsChecked.GetValueOrDefault())
+					SetValue(TextProperty, value);
+			}
+		}
+
+		public string TextOff
+		{
+			get
+			{
+				return textOff;
+			}
+			set
+			{
+				textOff = value;
+				if (!IsChecked.GetValueOrDefault())
+					SetValue(TextProperty, value);
+			}
 		}
 
 	}
