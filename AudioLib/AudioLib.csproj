@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bilinear.cs" />
+    <Compile Include="BufferConverter.cs" />
     <Compile Include="Conv.cs" />
     <Compile Include="CircularBuffer.cs" />
     <Compile Include="Enumerations.cs" />
