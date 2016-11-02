@@ -138,6 +138,7 @@
     <Compile Include="SimpleDFT.cs" />
     <Compile Include="Modules\SequencerStep.cs" />
     <Compile Include="SplineLut\SplineInterpolator.cs" />
+    <Compile Include="TF\Butterworth.cs" />
     <Compile Include="TF\Combine.cs" />
     <Compile Include="TF\Highpass1.cs" />
     <Compile Include="TF\Lowpass1.cs" />

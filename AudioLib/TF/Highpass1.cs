@@ -19,18 +19,18 @@ namespace AudioLib.TF
 			double[] a = new double[2];
 
 			// PRevent going over the Nyquist frequency
-			if (parameters[P_FREQ] >= fs * 0.5)
-				parameters[P_FREQ] = fs * 0.499;
+			if (Parameters[P_FREQ] >= Fs * 0.5)
+				Parameters[P_FREQ] = Fs * 0.499;
 
 			// Compensate for frequency in bilinear transform
-			float f = (float)(2.0 * fs * (Math.Tan((parameters[P_FREQ] * 2 * Math.PI) / (fs * 2))));
+			float f = (float)(2.0 * Fs * (Math.Tan((Parameters[P_FREQ] * 2 * Math.PI) / (Fs * 2))));
 			if (f == 0) f = 0.0001f; // prevent divByZero exception
 
-			b[0] = 2*fs;
-			b[1] = -2*fs;
+			b[0] = 2*Fs;
+			b[1] = -2*Fs;
 
-			a[0] = f+2*fs;
-			a[1] = f-2*fs;
+			a[0] = f+2*Fs;
+			a[1] = f-2*Fs;
 
 			var aInv = 1 / a[0];
 

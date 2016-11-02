@@ -70,13 +70,13 @@ namespace AudioLib.TF
 			double R2 = component[5]; // resistor in stack
 
 			// Pot values, each side
-			double T1 = component[6]*parameters[P_TREBLE];
-			double T2 = component[6]*(1-parameters[P_TREBLE]);
-			double B0 = component[8]*parameters[P_BASS];
-			double M1 = component[7] * parameters[P_MID];
+			double T1 = component[6]*Parameters[P_TREBLE];
+			double T2 = component[6]*(1-Parameters[P_TREBLE]);
+			double B0 = component[8]*Parameters[P_BASS];
+			double M1 = component[7] * Parameters[P_MID];
 			
 			// If fendermode = true then = 0
-			double M2 = (FenderMode) ? 0 : component[7] * (1 - parameters[P_MID]);
+			double M2 = (FenderMode) ? 0 : component[7] * (1 - Parameters[P_MID]);
 
 			// numerator
 
@@ -105,7 +105,7 @@ namespace AudioLib.TF
 
 			double[] zb = new double[4];
 			double[] za = new double[4];
-			Bilinear.Transform(sb, sa, out zb, out za, fs);
+			Bilinear.Transform(sb, sa, out zb, out za, Fs);
 			this.B = zb;
 			this.A = za;
 		}

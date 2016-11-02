@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace AudioLib.Modules
@@ -76,6 +78,22 @@ namespace AudioLib.Modules
 		public virtual void Update()
 		{
 
+		}
+
+		public string ToMatlabString(double fs)
+		{
+			var str = string.Format(
+@"b = [ {0} ];
+a = [ {1} ];
+h = fvtool(b,a);
+set(h,'Fs',{2});
+set(h,'FrequencyScale','log');
+",
+				string.Join(",", b.Select(x => x.ToString("0.000000", CultureInfo.InvariantCulture))),
+				string.Join(",", a.Select(x => x.ToString("0.000000", CultureInfo.InvariantCulture))),
+				fs);
+
+			return str;
 		}
 
 		public double Process(double input)
