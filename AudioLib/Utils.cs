@@ -109,7 +109,47 @@ namespace AudioLib
 			return output;
 		}
 
-		public static double Min(double[] input)
+        public static double[] Octavespace(double start, double max, int pointsPerOctave)
+        {
+            var output = new List<double>();
+            var pto = (double)pointsPerOctave;
+
+            int i = 0;
+            while (true)
+            {
+                double n = i / pto;
+                var val = start * Math.Pow(2, (1 + n));
+                if (val > max)
+                    break;
+
+                output.Add(val);
+                i++;
+            }
+
+            return output.ToArray();
+        }
+
+        public static double[] Decadespace(double start, double max, int pointsPerDecade)
+        {
+            var output = new List<double>();
+            var ptd = (double)pointsPerDecade;
+
+            int i = 0;
+            while (true)
+            {
+                double n = i / ptd;
+                var val = start * Math.Pow(10, (1 + n));
+                if (val > max)
+                    break;
+
+                output.Add(val);
+                i++;
+            }
+
+            return output.ToArray();
+        }
+
+        public static double Min(double[] input)
 		{
 			double min = input[0];
 			for(int i=1; i < input.Length; i++)
@@ -500,7 +540,51 @@ namespace AudioLib
 			return output;
 		}
 
-		
-		
+
+	    public static void ReverseInPlace(double[] sa)
+	    {
+	        var len = sa.Length;
+	        for (int i = 0; i < len / 2; i++)
+	        {
+	            var temp = sa[i];
+	            sa[i] = sa[len - 1 - i];
+                sa[len - 1 - i] = temp;
+            }
+	    }
+
+		public static double[] UnrollPhase(double[] phaseData)
+		{
+			var output = new double[phaseData.Length];
+			var prev = double.NaN;
+			var threshold = 1.7 * Math.PI;
+			var offset = 0.0;
+
+			for (int i = 0; i < phaseData.Length; i++)
+			{
+				if (i == 54)
+				{
+					
+				}
+				var d = phaseData[i];
+				if (double.IsNaN(prev))
+				{
+					output[i] = d;
+					prev = d;
+				}
+				else
+				{
+					if (d - prev > threshold)
+						offset -= 2 * Math.PI;
+					if (prev - d > threshold)
+						offset += 2 * Math.PI;
+
+					output[i] = d + offset;
+					prev = d;
+				}
+			}
+
+			return output;
+
+		}
 	}
 }

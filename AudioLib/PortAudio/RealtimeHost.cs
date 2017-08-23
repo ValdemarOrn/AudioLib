@@ -37,7 +37,7 @@ namespace AudioLib.PortAudioInterop
 		/// <summary>
 		/// Configuration info for the PortAudio Stream. Note that it is not allowed to change parameters in the config unless the StreamState is Closed
 		/// </summary>
-		RealtimeHostConfig Config;
+		public RealtimeHostConfig Config { get; private set; }
 
 		public IntPtr Stream { get { return Config.Stream; } }
 

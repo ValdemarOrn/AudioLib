@@ -7,34 +7,29 @@ namespace AudioLib.Valve
 {
 	public class Triode
 	{
-		public ModelParameters Parameters;
+		public ModelParameters Model;
 		public double V;
 		public double Rc;
 
 		public Triode()
 		{
-			Parameters = new ModelParameters();
+			Model = new ModelParameters();
 			V = 400;
 			Rc = 100e3;
 		}
 
 		public double GetCurrent(double Ep, double Eg)
 		{
-			double Mu = Parameters.Mu;
-			double Ex = Parameters.Ex;
-			double Kg1 = Parameters.Kg1;
-			double Kg2 = Parameters.Kg2;
-			double Kp = Parameters.Kp;
-			double Kvb = Parameters.Kvb;
-			double Ccg = Parameters.Ccg;
-			double Cpg = Parameters.Cpg;
-			double Ccp = Parameters.Ccp;
-			double Rgi = Parameters.Rgi;
+			double mu = Model.Mu;
+			double ex = Model.Ex;
+			double kg1 = Model.Kg1;
+			double kp = Model.Kp;
+			double kvb = Model.Kvb;
 
-			double E1 = (Ep/Kp)*Math.Log(1 + Math.Exp(Kp*(1/Mu + Eg / Math.Sqrt(Kvb + Ep*Ep))));
-			double Ip = (Math.Pow(E1, Ex)/Kg1)*2;
+			double e1 = (Ep/kp)*Math.Log(1 + Math.Exp(kp*(1/mu + Eg / Math.Sqrt(kvb + Ep*Ep))));
+			double ip = (Math.Pow(e1, ex)/kg1)*2;
 
-			return Ip;
+			return ip;
 		}
 
 		/// <summary>
@@ -44,8 +39,6 @@ namespace AudioLib.Valve
 		/// <returns></returns>
 		public double SolveCurrent(double Eg)
 		{
-			Eg = SaturateEg(Eg);
-
 			double Emin = 0;
 			double Emax = V;
 
@@ -64,35 +57,6 @@ namespace AudioLib.Valve
 				else
 					Emin = Ep;
 			}
-		}
-
-		/*public double[] GenerateLookupTable(double vMin, double vMax, int sampleCount)
-		{
-			var output = new double[sampleCount];
-			var voltages = Utils.Linspace(vMin, vMax, sampleCount);
-			for (int i = 0; i < sampleCount; i++)
-			{
-				var current = SolveCurrent(voltages[i]);
-
-			}
-		}*/
-
-		/// <summary>
-		/// Simulates the effects of the diode in the Koren Model.
-		/// Saturates the input voltage when it enters saturation (Eg > 0)
-		/// </summary>
-		/// <param name="Eg"></param>
-		/// <returns></returns>
-		public double SaturateEg(double Eg)
-		{
-			double factor = Parameters.Knee;
-			double start = 1/factor;
-			double cutoff = Parameters.SaturationPoint;
-
-			if (Eg < cutoff)
-				return Eg;
-			else
-				return Math.Log(start + (Eg - cutoff)) / factor - Math.Log(start) / factor + cutoff;
 		}
 	}
 }

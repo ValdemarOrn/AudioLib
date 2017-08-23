@@ -142,10 +142,17 @@ namespace AudioLib
 		/// </summary>
 		/// <param name="position"></param>
 		/// <param name="data"></param>
+		/// <param name="scalePosition">if true, position should be given as range 0...1</param>
 		/// <returns></returns>
-		public static double Spline(double position, double[] data)
+		public static double Spline(double position, double[] data, bool scalePosition = true)
 		{
-			double pos = position * (data.Length - 1);
+			double pos;
+
+			if (scalePosition)
+				pos = position * (data.Length - 1);
+			else
+				pos = position;
+
 			double y0, y1, y2, y3;
 			double a,b,c, mu;
 			double output;

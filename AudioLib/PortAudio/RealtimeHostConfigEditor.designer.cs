@@ -45,6 +45,7 @@
 			this.buttonOK = new System.Windows.Forms.Button();
 			this.buttonCancel = new System.Windows.Forms.Button();
 			this.labelASIO = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// comboBoxHost
@@ -203,11 +204,21 @@
 			this.labelASIO.Text = "ASIO Control Panel";
 			this.labelASIO.Click += new System.EventHandler(this.labelASIO_Click);
 			// 
-			// PortAudioConfigEditor
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(239, 89);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(205, 13);
+			this.label3.TabIndex = 21;
+			this.label3.Text = "Make sure this matches your ASIO config!";
+			// 
+			// RealtimeHostConfigEditor
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(482, 391);
+			this.Controls.Add(this.label3);
 			this.Controls.Add(this.labelASIO);
 			this.Controls.Add(this.buttonCancel);
 			this.Controls.Add(this.buttonOK);
@@ -226,7 +237,7 @@
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.comboBoxHost);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-			this.Name = "PortAudioConfigEditor";
+			this.Name = "RealtimeHostConfigEditor";
 			this.Text = "Host Setup";
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -252,5 +263,6 @@
 		private System.Windows.Forms.Button buttonOK;
 		private System.Windows.Forms.Button buttonCancel;
 		private System.Windows.Forms.Label labelASIO;
+		private System.Windows.Forms.Label label3;
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace AudioLib.PortAudioInterop
 {
@@ -94,8 +95,8 @@ namespace AudioLib.PortAudioInterop
 				if (Samplerate < 0)
 					throw new Exception("Samplerate has not been set");
 
-				InputLatencyMs = value / Samplerate;
-				OutputLatencyMs = value / Samplerate;
+				InputLatencyMs = value / (double)Samplerate;
+				OutputLatencyMs = value / (double)Samplerate;
 			}
 		}
 
@@ -147,6 +148,7 @@ namespace AudioLib.PortAudioInterop
 			if (!PortAudio.Pa_IsInitialized)
 				PortAudio.Pa_Initialize();
 
+			Application.EnableVisualStyles();
 			var editor = new RealtimeHostConfigEditor();
 
 			if (config != null)

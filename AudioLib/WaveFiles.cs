@@ -12,6 +12,15 @@ namespace AudioLib
 	{
 		#region Read Operations
 
+		public static FormatChunkData ReadWaveFormat(string filename)
+		{
+			var data = System.IO.File.ReadAllBytes(filename);
+			var clm = new List<byte[]>();
+			FormatChunkData format;
+			ReadWaveFile(data, ref clm, out format);
+			return format;
+		}
+
 		/// <summary>
 		/// Read a WAVE file. Supports multiple channels, any bitrate.
 		/// Supported formats are IEEE 32bit floating point and uncompressed PCM 8/16/24/32 bit
@@ -27,13 +36,15 @@ namespace AudioLib
 		public static double[][] ReadWaveFile(string filename, ref List<byte[]> clmData)
 		{
 			var data = System.IO.File.ReadAllBytes(filename);
-			return ReadWaveFile(data, ref clmData);
+			FormatChunkData format;
+			return ReadWaveFile(data, ref clmData, out format);
 		}
 
 		public static double[][] ReadWaveFile(byte[] data)
 		{
 			var clm = new List<byte[]>();
-			return ReadWaveFile(data, ref clm);
+			FormatChunkData format;
+			return ReadWaveFile(data, ref clm, out format);
 		}
 
 		/// <summary>
@@ -42,16 +53,17 @@ namespace AudioLib
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <param name="clmData">a list to be filled with metadata from the clm chunk</param>
+		/// <param name="format"></param>
 		/// <returns></returns>
-		public static double[][] ReadWaveFile(byte[] data, ref List<byte[]> clmData)
+		public static double[][] ReadWaveFile(byte[] data, ref List<byte[]> clmData, out FormatChunkData format)
 		{
+			format = null;
 			var waveFormat = new byte[] { data[8], data[9], data[10], data[11] };
 			string fmt = Encoding.ASCII.GetString(waveFormat);
 			if (fmt != "WAVE")
 				return null;
 
 			int idx = 12;
-			FormatChunkData format = null;
 			double[][] output = null;
 
 			while (idx < data.Length)
@@ -166,7 +178,7 @@ namespace AudioLib
 			return fmt;
 		}
 
-		private class FormatChunkData
+		public class FormatChunkData
 		{
 			public int AudioFormat;
 			public int NumChannels;

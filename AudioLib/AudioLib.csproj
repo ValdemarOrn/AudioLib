@@ -89,6 +89,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -104,6 +105,7 @@
     <Compile Include="CircularBuffer.cs" />
     <Compile Include="Enumerations.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Freqz.cs" />
     <Compile Include="Infrastructure\Logging.cs" />
     <Compile Include="Interpolate.cs" />
     <Compile Include="Modules\Ahdsr.cs" />
@@ -138,6 +140,7 @@
     <Compile Include="SimpleDFT.cs" />
     <Compile Include="Modules\SequencerStep.cs" />
     <Compile Include="SplineLut\SplineInterpolator.cs" />
+    <Compile Include="TfUtil.cs" />
     <Compile Include="TF\Butterworth.cs" />
     <Compile Include="TF\Combine.cs" />
     <Compile Include="TF\Highpass1.cs" />
@@ -178,6 +181,7 @@
     <Compile Include="Valve\Triode.cs" />
     <Compile Include="WaveFiles.cs" />
     <Compile Include="WpfUi\Announcer.cs" />
+    <Compile Include="WpfUi\ChildFinder.cs" />
     <Compile Include="WpfUi\FlatToggleButton.xaml.cs">
       <DependentUpon>FlatToggleButton.xaml</DependentUpon>
     </Compile>
@@ -186,6 +190,9 @@
     </Compile>
     <Compile Include="WpfUi\Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WpfUi\PlotView.xaml.cs">
+      <DependentUpon>PlotView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WpfUi\WaveformView.xaml.cs">
       <DependentUpon>WaveformView.xaml</DependentUpon>
@@ -206,6 +213,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="WpfUi\Spinner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WpfUi\PlotView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

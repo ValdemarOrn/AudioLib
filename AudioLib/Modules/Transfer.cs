@@ -80,7 +80,12 @@ namespace AudioLib.Modules
 
 		}
 
-		public string ToMatlabString(double fs)
+	    public string ToMatlabString(double fs)
+	    {
+	        return ToMatlabString(fs, b, a);
+	    }
+
+	    public static string ToMatlabString(double fs, double[] b, double[] a)
 		{
 			var str = string.Format(
 @"b = [ {0} ];
@@ -89,8 +94,8 @@ h = fvtool(b,a);
 set(h,'Fs',{2});
 set(h,'FrequencyScale','log');
 ",
-				string.Join(",", b.Select(x => x.ToString("0.000000", CultureInfo.InvariantCulture))),
-				string.Join(",", a.Select(x => x.ToString("0.000000", CultureInfo.InvariantCulture))),
+				string.Join(",", b.Select(x => x.ToString("0.00000000000000", CultureInfo.InvariantCulture))),
+				string.Join(",", a.Select(x => x.ToString("0.00000000000000", CultureInfo.InvariantCulture))),
 				fs);
 
 			return str;

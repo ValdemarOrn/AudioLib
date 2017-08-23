@@ -66,6 +66,15 @@ namespace AudioLib
 					Bilinear.Supertransform(b, a, zb, za, fs);
 					break;
 			}
+
+		    var g = za[0];
+            var gInv = 1 / g;
+
+		    for (int i = 0; i < zb.Length; i++)
+		    {
+		        za[i] *= gInv;
+                zb[i] *= gInv;
+            }
 		}
 
 
