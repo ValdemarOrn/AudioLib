@@ -110,13 +110,16 @@ namespace AudioLib.Modules
 			double sinOmega = Math.Sin(omega);
 			double cosOmega = Math.Cos(omega);
 
-			double sqrtGain = 0.0;
+			double sqrtA = 0.0;
 			double alpha = 0.0;
+
+			// The gain is here is a bit fishy! It's now correct for peaking
+			var A = Math.Pow(10, GainDB / 40);
 
 			if (Type == FilterType.LowShelf || Type == FilterType.HighShelf)
 			{
-				alpha = sinOmega / 2 * Math.Sqrt((gain + 1 / gain) * (1 / Slope - 1) + 2);
-				sqrtGain = Math.Sqrt(gain);
+				alpha = sinOmega / 2 * Math.Sqrt((A + 1 / A) * (1 / Slope - 1) + 2);
+				sqrtA = Math.Sqrt(A);
 			}
 			else
 			{
@@ -158,28 +161,28 @@ namespace AudioLib.Modules
 					a2 = 1 - alpha;
 					break;
 				case FilterType.Peak:
-					b0 = 1 + (alpha * gain);
+					b0 = 1 + (alpha * A);
 					b1 = -2 * cosOmega;
-					b2 = 1 - (alpha * gain);
-					a0 = 1 + (alpha / gain);
+					b2 = 1 - (alpha * A);
+					a0 = 1 + (alpha / A);
 					a1 = -2 * cosOmega;
-					a2 = 1 - (alpha / gain);
+					a2 = 1 - (alpha / A);
 					break;
 				case FilterType.LowShelf:
-					b0 = gain * ((gain + 1) - (gain - 1) * cosOmega + 2 * sqrtGain * alpha);
-					b1 = 2 * gain * ((gain - 1) - (gain + 1) * cosOmega);
-					b2 = gain * ((gain + 1) - (gain - 1) * cosOmega - 2 * sqrtGain * alpha);
-					a0 = (gain + 1) + (gain - 1) * cosOmega + 2 * sqrtGain * alpha;
-					a1 = -2 * ((gain - 1) + (gain + 1) * cosOmega);
-					a2 = (gain + 1) + (gain - 1) * cosOmega - 2 * sqrtGain * alpha;
+					b0 = A * ((A + 1) - (A - 1) * cosOmega + 2 * sqrtA * alpha);
+					b1 = 2 * A * ((A - 1) - (A + 1) * cosOmega);
+					b2 = A * ((A + 1) - (A - 1) * cosOmega - 2 * sqrtA * alpha);
+					a0 = (A + 1) + (A - 1) * cosOmega + 2 * sqrtA * alpha;
+					a1 = -2 * ((A - 1) + (A + 1) * cosOmega);
+					a2 = (A + 1) + (A - 1) * cosOmega - 2 * sqrtA * alpha;
 					break;
 				case FilterType.HighShelf:
-					b0 = gain * ((gain + 1) + (gain - 1) * cosOmega + 2 * sqrtGain * alpha);
-					b1 = -2 * gain * ((gain - 1) + (gain + 1) * cosOmega);
-					b2 = gain * ((gain + 1) + (gain - 1) * cosOmega - 2 * sqrtGain * alpha);
-					a0 = (gain + 1) - (gain - 1) * cosOmega + 2 * sqrtGain * alpha;
-					a1 = 2 * ((gain - 1) - (gain + 1) * cosOmega);
-					a2 = (gain + 1) - (gain - 1) * cosOmega - 2 * sqrtGain * alpha;
+					b0 = A * ((A + 1) + (A - 1) * cosOmega + 2 * sqrtA * alpha);
+					b1 = -2 * A * ((A - 1) + (A + 1) * cosOmega);
+					b2 = A * ((A + 1) + (A - 1) * cosOmega - 2 * sqrtA * alpha);
+					a0 = (A + 1) - (A - 1) * cosOmega + 2 * sqrtA * alpha;
+					a1 = 2 * ((A - 1) - (A + 1) * cosOmega);
+					a2 = (A + 1) - (A - 1) * cosOmega - 2 * sqrtA * alpha;
 					break;
 			}
 
@@ -199,6 +202,7 @@ namespace AudioLib.Modules
 		/// <returns></returns>
 		public double GetResponse(double freq)
 		{
+			// This looks buggered, the gain is 2x too big
 			double phi = Math.Pow((Math.Sin(2 * Math.PI * freq / (2.0 * Samplerate))), 2);
 			return (Math.Pow(b0 + b1 + b2, 2.0) - 4.0 * (b0 * b1 + 4.0 * b0 * b2 + b1 * b2) * phi + 16.0 * b0 * b2 * phi * phi) / (Math.Pow(1.0 + a1 + a2, 2.0) - 4.0 * (a1 + 4.0 * a2 + a1 * a2) * phi + 16.0 * a2 * phi * phi);
 		}

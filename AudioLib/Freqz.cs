@@ -16,9 +16,14 @@ namespace AudioLib
             public double Phase { get; set; }
         }
 
-        public static Point[] Compute(double[] b, double[] a, int points)
+	    public static Point[] Compute(double[] b, double[] a, int points)
+	    {
+		    var ws = Enumerable.Range(0, points).Select(x => x / (double)points * Math.PI).ToArray();
+		    return Compute(b, a, ws);
+	    }
+
+	    public static Point[] Compute(double[] b, double[] a, double[] ws)
         {
-            var ws = Enumerable.Range(0, points).Select(x => x / (double)points * Math.PI).ToArray();
             var output = new List<Point>();
 
             for (int i = 0; i < ws.Length; i++)

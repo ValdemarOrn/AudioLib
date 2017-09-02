@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using AudioLib.PortAudio;
 
 namespace AudioLib.PortAudioInterop
 {
@@ -108,6 +109,9 @@ namespace AudioLib.PortAudioInterop
 		public string Serialize()
 		{
 			var sb = new StringBuilder();
+			sb.AppendLine("APIName=" + APIName);
+			sb.AppendLine("InputDeviceName=" + InputDeviceName);
+			sb.AppendLine("OutputDeviceName=" + OutputDeviceName);
 			sb.AppendLine("InputDeviceID=" + InputDeviceID);
 			sb.AppendLine("OutputDeviceID=" + OutputDeviceID);
 			sb.AppendLine("NumberOfInputs=" + NumberOfInputs);
@@ -127,11 +131,35 @@ namespace AudioLib.PortAudioInterop
 					.Select(x => x.Trim())
 					.ToDictionary(x => x.Split('=')[0].Trim(), x => x.Split('=')[1].Trim());
 
+				var apiName = dict["APIName"];
+				var inDeviceId = Convert.ToInt32(dict["InputDeviceID"]);
+				var outDeviceId = Convert.ToInt32(dict["OutputDeviceID"]);
+				var inputDeviceName = dict["InputDeviceName"];
+				var outputDeviceName = dict["OutputDeviceName"];
+				var numInputs = Convert.ToInt32(dict["NumberOfInputs"]);
+				var numOutputs = Convert.ToInt32(dict["NumberOfOutputs"]);
+
+				// fuzzy matching of devices as the deviceIds can change
+				// prefers a device that matches on apiName, deviceId and deviceName, but falls back to match only apiName and deviceName if not found
+
+				var devices = GetSelectedDevices(apiName, inDeviceId, outDeviceId, inputDeviceName, outputDeviceName);
+				var realInputDeviceId = devices.Item1;
+				var realOutputDeviceId = devices.Item2;
+
+				var inDevice = PortAudio.Pa_GetDeviceInfo(realInputDeviceId);
+				var outDevice = PortAudio.Pa_GetDeviceInfo(realOutputDeviceId);
+
+				if (inDevice.maxInputChannels < numInputs)
+					numInputs = inDevice.maxInputChannels;
+
+				if (outDevice.maxOutputChannels < numOutputs)
+					numOutputs = outDevice.maxOutputChannels;
+
 				var conf = new RealtimeHostConfig();
-				conf.InputDeviceID = Convert.ToInt32(dict["InputDeviceID"]);
-				conf.OutputDeviceID = Convert.ToInt32(dict["OutputDeviceID"]);
-				conf.NumberOfInputs = Convert.ToInt32(dict["NumberOfInputs"]);
-				conf.NumberOfOutputs = Convert.ToInt32(dict["NumberOfOutputs"]);
+				conf.InputDeviceID = realInputDeviceId;
+				conf.OutputDeviceID = realOutputDeviceId;
+				conf.NumberOfInputs = numInputs;
+				conf.NumberOfOutputs = numOutputs;
 				conf.Samplerate = Convert.ToInt32(dict["Samplerate"]);
 				conf.BufferSize = Convert.ToUInt32(dict["BufferSize"]);
 				return conf;
@@ -140,6 +168,31 @@ namespace AudioLib.PortAudioInterop
 			{
 				return null;
 			}
+		}
+
+		private static Tuple<int, int> GetSelectedDevices(string apiName, int inDeviceId, int outDeviceId, string inputDeviceName, string outputDeviceName)
+		{
+			var devices = Enumerable.Range(0, PortAudio.Pa_GetDeviceCount())
+				.ToDictionary(x => x, x => PortAudio.Pa_GetDeviceInfo(x))
+				.Where(x => PortAudio.Pa_GetHostApiInfo(x.Value.hostApi).name == apiName)
+				.ToDictionary(x => x.Key, x => x.Value);
+
+			int realInputDeviceId;
+			int realOutputDeviceId;
+
+			var matchedInputArr = devices.Where(x => x.Key == inDeviceId && x.Value.name == inputDeviceName).ToArray();
+			if (matchedInputArr.Length == 1)
+				realInputDeviceId = matchedInputArr[0].Key;
+			else
+				realInputDeviceId = devices.Where(x => x.Value.name == inputDeviceName).First().Key;
+
+			var matchedOutputArr = devices.Where(x => x.Key == outDeviceId && x.Value.name == outputDeviceName).ToArray();
+			if (matchedOutputArr.Length == 1)
+				realOutputDeviceId = matchedOutputArr[0].Key;
+			else
+				realOutputDeviceId = devices.Where(x => x.Value.name == outputDeviceName).First().Key;
+
+			return Tuple.Create(realInputDeviceId, realOutputDeviceId);
 		}
 
 
@@ -153,12 +206,29 @@ namespace AudioLib.PortAudioInterop
 
 			if (config != null)
 			{
-				editor.InputDeviceID = config.InputDeviceID;
-				editor.OutputDeviceID = config.OutputDeviceID;
+				var apiName = config.APIName;
+
+				var devices = GetSelectedDevices(apiName, config.InputDeviceID, config.OutputDeviceID, config.InputDeviceName, config.OutputDeviceName);
+				var realInputDeviceId = devices.Item1;
+				var realOutputDeviceId = devices.Item2;
+
+				var inDevice = PortAudio.Pa_GetDeviceInfo(realInputDeviceId);
+				var outDevice = PortAudio.Pa_GetDeviceInfo(realOutputDeviceId);
+
+				var numInputs = (config.NumberOfInputs < inDevice.maxInputChannels)
+					? config.NumberOfInputs
+					: inDevice.maxInputChannels;
+
+				var numOutputs = (config.NumberOfOutputs < inDevice.maxOutputChannels)
+					? config.NumberOfOutputs
+					: outDevice.maxOutputChannels;
+
+				editor.InputDeviceID = realInputDeviceId;
+				editor.OutputDeviceID = realOutputDeviceId;
 				editor.Samplerate = config.Samplerate;
 				editor.Latency = (int)(config.InputLatencyMs * config.Samplerate);
-				editor.InputChannels = config.NumberOfInputs;
-				editor.OutputChannels = config.NumberOfOutputs;
+				editor.InputChannels = numInputs;
+				editor.OutputChannels = numOutputs;
 			}
 
 			editor.ShowDialog();
@@ -175,6 +245,15 @@ namespace AudioLib.PortAudioInterop
 				conf.Samplerate = editor.Samplerate;
 				conf.InputLatencyMs = editor.Latency / (double)editor.Samplerate;
 				conf.OutputLatencyMs = editor.Latency / (double)editor.Samplerate;
+
+				var supported = PortAudio.Pa_IsFormatSupported(ref conf.inputParameters, ref conf.outputParameters, conf.Samplerate);
+				if (supported == PortAudio.PaError.paInvalidSampleRate)
+					throw new InvalidFormatException("The samplerate you have selected is not supported by the device");
+				if (supported == PortAudio.PaError.paInvalidChannelCount)
+					throw new InvalidFormatException("The number of inputs or outputs you have selected is not supported by the device");
+				if (supported != PortAudio.PaError.paNoError)
+					throw new InvalidFormatException("The configuration you have selected is not supported by the device");
+
 				return conf;
 			}
 		}

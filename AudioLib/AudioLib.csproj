@@ -113,6 +113,7 @@
     <Compile Include="Modules\LFO.cs" />
     <Compile Include="Modules\LUT.cs" />
     <Compile Include="Midi\Midi.cs" />
+    <Compile Include="Modules\OnePole.cs" />
     <Compile Include="Modules\Oscillator.cs" />
     <Compile Include="Modules\RandomWalk.cs" />
     <Compile Include="Modules\TransferVariable.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Modules\VelocityMap.cs" />
     <Compile Include="Noise.cs" />
     <Compile Include="PortAttributes.cs" />
+    <Compile Include="PortAudio\InvalidFormatException.cs" />
     <Compile Include="PortAudio\PortAudio.cs" />
     <Compile Include="PortAudio\PortAudioASIO.cs" />
     <Compile Include="PortAudio\RealtimeHost.cs" />

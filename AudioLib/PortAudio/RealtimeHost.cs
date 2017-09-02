@@ -49,7 +49,18 @@ namespace AudioLib.PortAudioInterop
 			StreamState = StreamState.Closed;
 		}
 
+		~RealtimeHost()
+		{
+			Dispose(false);
+		}
+
 		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool isDisposing)
 		{
 			PortAudio.Pa_Terminate();
 		}
